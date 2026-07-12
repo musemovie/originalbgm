@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>結婚式ムービーの音、ミニ体験 | Muse Movie</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useRef } = React;
+
+// ================================================================
+// ▼ リンク設定(ここを書き換えるだけでOK)
+// ================================================================
+const LINKS = {
+  coconala: "https://coconala.com/users/5637268",
+  instagram: "https://www.instagram.com/muse_movie_wedding?igsh=dHQ2OHNkZ3l6aGN2&utm_source=qr",
+};
+
+// ▼ 音源ファイル(index.htmlと同じ場所に置いてください)
+const AUDIO = {
+  emotional: "bgm-emotional.mp3",
+  pop: "bgm-pop.mp3",
+  cinematic: "bgm-cinematic.mp3",
+  natural: "bgm-natural.mp3",
+  thanks: "song-thanks.mp3",
+  sorry: "song-sorry.mp3",
+  watch: "song-watch.mp3",
+  love: "song-love.mp3",
+};
+
+// ================================================================
+// テーマカラー
+// ================================================================
+const C = {
+  bg: "#EFE9E6",
+  accent: "#CBA890",
+  border: "#DDC9BB",
+  ink: "#2D2A29",
+  paper: "#FBF8F6",
+  panel: "#E8DCD5",
+};
+
+// ================================================================
+// 共通:サンプル再生プレーヤー
+// ================================================================
+function SamplePlayer({ src, label }) {
+  const [state, setState] = useState("idle"); // idle | loading | playing | error
+  const [progress, setProgress] = useState(0);
+  const audioRef = useRef(null);
+
+  const play = async () => {
+    if (!audioRef.current) return;
+    setState("loading");
+    try {
+      await audioRef.current.play();
+      setState("playing");
+    } catch (e) {
+      setState("error");
+    }
+  };
+
+  const pause = () => {
+    if (!audioRef.current) return;
+    audioRef.current.pause();
+    setState("idle");
+  };
+
+  if (!src) {
+    return <p style={{ fontSize: 12, color: "#8a8177", marginTop: 14 }}>試聴サンプルはただいま準備中です。</p>;
+  }
+  if (state === "error") {
+    return <p style={{ fontSize: 12, color: "#8a8177", marginTop: 14 }}>お使いの環境では再生できませんでした。Instagramでサンプルを公開しています。</p>;
+  }
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      <audio
+        ref={audioRef}
+        src={src}
+        preload="none"
+        playsInline
+        onTimeUpdate={(e) => {
+          const el = e.currentTarget;
+          if (el.duration) setProgress(el.currentTime / el.duration);
+        }}
+        onEnded={() => { setProgress(0); setState("idle"); }}
+        onError={() => setState("error")}
+        style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+      />
+      <div style={{
+        display: "flex", alignItems: "center", gap: 12,
+        background: C.bg, border: `1px solid ${C.border}`, borderRadius: 999, padding: "8px 16px 8px 8px",
+      }}>
+        <button
+          onClick={state === "playing" ? pause : play}
+          aria-label={state === "playing" ? "一時停止" : "再生"}
+          style={{
+            width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+            background: C.accent, border: "none", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+          {state === "loading" ? (
+            <span style={{ color: "#fff", fontSize: 10 }}>…</span>
+          ) : state === "playing" ? (
+            <svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="1" width="3.5" height="12" rx="1" fill="#fff" /><rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="#fff" /></svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 1.5 L12 7 L3 12.5 Z" fill="#fff" /></svg>
+          )}
+        </button>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 11, color: C.accent, letterSpacing: "0.15em", margin: "0 0 5px", textAlign: "left" }}>
+            {label}
+          </p>
+          <div style={{ height: 5, background: "#E4D8CE", borderRadius: 999, overflow: "hidden" }}>
+            <div style={{ width: `${progress * 100}%`, height: "100%", background: C.accent, borderRadius: 999, transition: "width .1s linear" }} />
+          </div>
+        </div>
+      </div>
+      <p style={{ fontSize: 10.5, color: "#a39a8e", margin: "8px 0 0", textAlign: "left" }}>
+        ※ 音が出ないときは、端末の音量をご確認ください
+      </p>
+    </div>
+  );
+}
+
+// ================================================================
+// 共通:CTA(Muse Movie紹介)
+// ================================================================
+function Cta({ buttonText }) {
+  return (
+    <div style={{ marginTop: 24, padding: "24px 20px", background: C.panel, borderRadius: 16 }}>
+      <p style={{ letterSpacing: "0.25em", fontSize: 11, color: C.accent, fontWeight: 700, margin: 0 }}>MUSE MOVIE</p>
+      <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 16.5, fontWeight: 600, margin: "10px 0 10px", lineHeight: 1.7, textAlign: "left" }}>
+        結婚式ムービーを制作しています
+      </p>
+      <p style={{ fontSize: 13, lineHeight: 2, color: C.ink, textAlign: "left", margin: "0 0 18px" }}>
+        プロフィールムービーやエンドロール、両親への手紙がそのまま一曲の歌になる「レターソング」など、おふたりのためだけのムービーとオリジナル楽曲をお作りしています。
+        <br />
+        ムービーのことでお手伝いできることがあれば、お気軽にご相談ください。
+      </p>
+      <div style={{ display: "grid", gap: 10 }}>
+        <a href={LINKS.coconala} target="_blank" rel="noreferrer"
+          style={{
+            display: "block", textAlign: "center", background: C.accent, color: "#fff",
+            borderRadius: 999, padding: "14px 16px", fontSize: 14, fontWeight: 700, textDecoration: "none",
+          }}>
+          {buttonText}
+        </a>
+        <a href={LINKS.instagram} target="_blank" rel="noreferrer"
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            background: "transparent", color: C.ink, border: `1.5px solid ${C.accent}`,
+            borderRadius: 999, padding: "12px 16px", fontSize: 13.5, fontWeight: 700, textDecoration: "none",
+          }}>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="1.8">
+            <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" />
+            <circle cx="12" cy="12" r="4.3" />
+            <circle cx="17.4" cy="6.6" r="1.1" fill={C.accent} stroke="none" />
+          </svg>
+          Instagramで作品を見る
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ================================================================
+// 共通:UIパーツ
+// ================================================================
+function Dots({ total, step }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 24 }}>
+      {Array.from({ length: total }).map((_, i) => (
+        <div key={i} style={{
+          width: step > i ? 22 : 8, height: 8, borderRadius: 999,
+          background: step >= i ? C.accent : C.border, transition: "all .25s ease",
+        }} />
+      ))}
+    </div>
+  );
+}
+
+function Wave() {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 4, height: 34, marginBottom: 14 }}>
+      {[12, 22, 30, 18, 26, 34, 20, 28, 14, 24, 16].map((h, i) => (
+        <div key={i} className="bar" style={{
+          width: 4, height: h, borderRadius: 2,
+          background: i % 3 === 0 ? C.accent : C.border,
+          animationDelay: `${i * 0.05}s`,
+        }} />
+      ))}
+    </div>
+  );
+}
+
+const optStyle = {
+  background: C.paper, border: `1px solid ${C.border}`, borderRadius: 12,
+  padding: "15px 18px", fontSize: 14.5, fontWeight: 500, color: C.ink,
+  textAlign: "left", cursor: "pointer", fontFamily: "inherit", width: "100%",
+};
+
+function BackLink({ onClick, children }) {
+  return (
+    <button onClick={onClick}
+      style={{ marginTop: 16, background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>
+      {children}
+    </button>
+  );
+}
+
+// ================================================================
+// 体験①:オリジナルBGM診断(プロフィールムービー向け)
+// ================================================================
+const BGM_RESULTS = {
+  emotional: {
+    name: "しっとり感動バラード",
+    en: "EMOTIONAL BALLAD",
+    desc: "ピアノの一音一音が言葉のように響く、涙腺にそっと触れるタイプ。後半でストリングスが重なり、会場全体が静かにひとつになります。",
+    spec: "ピアノ主体/BPM 70〜90/サビで弦が広がる構成",
+  },
+  pop: {
+    name: "ハートフル・ポップ",
+    en: "HEARTFUL POP",
+    desc: "アコースティックギターと手拍子が弾む、思わず笑顔になるタイプ。ゲストの緊張がほどけて、写真の切り替えも軽やかに見えます。",
+    spec: "アコギ+クラップ/BPM 110〜125/明るいメジャーコード",
+  },
+  cinematic: {
+    name: "シネマティック・オーケストラ",
+    en: "CINEMATIC",
+    desc: "静かなピアノから始まり、映画の予告編のように壮大に盛り上がるタイプ。ここぞという場面の期待感を最大まで高めます。",
+    spec: "ピアノ×ストリングス/静→壮大のビルドアップ構成",
+  },
+  natural: {
+    name: "ナチュラル・アコースティック",
+    en: "NATURAL ACOUSTIC",
+    desc: "木漏れ日のようなあたたかさのタイプ。アコギやウクレレの生楽器が寄り添い、日常の写真がそのまま愛おしく見えます。",
+    spec: "アコギ・ウクレレ・ハミング/BPM 90〜105",
+  },
+};
+
+const BGM_QUESTIONS = [
+  {
+    q: "どのシーンで流したいですか？",
+    opts: [
+      { label: "プロフィールムービー", key: "profile", pts: { pop: 1, natural: 1 } },
+      { label: "両親への手紙・エンドロール", key: "letter", pts: { emotional: 2 } },
+      { label: "オープニング・入場", key: "opening", pts: { cinematic: 2 } },
+    ],
+  },
+  {
+    q: "会場はどんな雰囲気ですか？",
+    opts: [
+      { label: "ホテル・格式ある会場", key: "hotel", pts: { cinematic: 1, emotional: 1 } },
+      { label: "ガーデン・ゲストハウス", key: "garden", pts: { natural: 2 } },
+      { label: "レストラン・カジュアルな会場", key: "restaurant", pts: { pop: 2 } },
+      { label: "まだ決めていない", key: "undecided", pts: {} },
+    ],
+  },
+  {
+    q: "ムービーを見たゲストに、どうなってほしいですか？",
+    opts: [
+      { label: "涙がこぼれてほしい", key: "cry", pts: { emotional: 3 } },
+      { label: "思わず笑顔になってほしい", key: "smile", pts: { pop: 3 } },
+      { label: "鳥肌が立つほど圧倒されてほしい", key: "awe", pts: { cinematic: 3 } },
+      { label: "あたたかい気持ちになってほしい", key: "warm", pts: { natural: 3 } },
+    ],
+  },
+  {
+    q: "ふたりの「好きな音」に近いのは？",
+    opts: [
+      { label: "静かなピアノの音色", key: "piano", pts: { emotional: 2 } },
+      { label: "明るいJ-POPのバンドサウンド", key: "band", pts: { pop: 2 } },
+      { label: "映画のサウンドトラック", key: "ost", pts: { cinematic: 2 } },
+      { label: "カフェで流れるアコースティック", key: "acoustic", pts: { natural: 2 } },
+    ],
+  },
+];
+
+const WISH_TO_TYPE = { cry: "emotional", smile: "pop", awe: "cinematic", warm: "natural" };
+
+const BGM_SCENE_NOTE = {
+  profile: "写真の切り替えと相性のよい、一定テンポの構成に仕上げるのがおすすめです。",
+  letter: "お手紙の朗読やエンドロールに寄り添う、じゃまをしない音の設計が鍵になります。",
+  opening: "イントロの数秒でゲストの視線を集める、立ち上がりの強い構成がおすすめです。",
+};
+const BGM_VENUE_NOTE = {
+  hotel: "格式ある会場では、音の厚みがそのまま上質さとして伝わります。",
+  garden: "自然光あふれる会場には、生楽器のやわらかな質感がよく馴染みます。",
+  restaurant: "ゲストとの距離が近い会場では、親しみやすい音が空気をつくります。",
+  undecided: "",
+};
+
+function bgmDiagnose(answers) {
+  const score = { emotional: 0, pop: 0, cinematic: 0, natural: 0 };
+  answers.forEach((ansKey, qi) => {
+    const opt = BGM_QUESTIONS[qi].opts.find((o) => o.key === ansKey);
+    if (!opt) return;
+    for (const [type, p] of Object.entries(opt.pts)) score[type] += p;
+  });
+  const sorted = Object.entries(score).sort((a, b) => b[1] - a[1]);
+  let firstType = sorted[0][0];
+  const firstPts = sorted[0][1];
+  const wishType = WISH_TO_TYPE[answers[2]];
+  if (wishType && score[wishType] === firstPts) firstType = wishType;
+  const secondType = sorted.map((e) => e[0]).find((t) => t !== firstType);
+  return { firstType, secondType };
+}
+
+function BgmFlow({ onHome }) {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const total = BGM_QUESTIONS.length;
+
+  const pick = (key) => {
+    const next = [...answers];
+    next[step] = key;
+    setAnswers(next);
+    setStep(step + 1);
+  };
+  const restart = () => { setAnswers([]); setStep(0); };
+
+  const diag = step === total ? bgmDiagnose(answers) : null;
+  const result = diag ? BGM_RESULTS[diag.firstType] : null;
+  const second = diag ? BGM_RESULTS[diag.secondType] : null;
+
+  return (
+    <div>
+      <header style={{ textAlign: "center", marginBottom: 26 }}>
+        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>MUSE MOVIE</p>
+        <h1 style={{ fontFamily: "'Noto Serif JP', serif", fontWeight: 600, fontSize: 24, margin: "10px 0 8px", letterSpacing: "0.08em" }}>
+          オリジナルBGM<br />ミニ体験
+        </h1>
+        <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 12px" }} />
+        <p style={{ fontSize: 13, lineHeight: 1.9, color: "#5c554d", margin: 0 }}>
+          4つの質問で、おふたりのムービーに合う<br />BGMを診断して、その場で試聴できます。
+        </p>
+      </header>
+
+      <Dots total={total} step={step} />
+
+      {step < total ? (
+        <div className="fadein" key={step}>
+          <p style={{ textAlign: "center", fontSize: 12, color: C.accent, letterSpacing: "0.2em", margin: "0 0 6px" }}>
+            Q{step + 1} / {total}
+          </p>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 18, fontWeight: 600, textAlign: "center", margin: "0 0 20px", lineHeight: 1.7 }}>
+            {BGM_QUESTIONS[step].q}
+          </h2>
+          <div style={{ display: "grid", gap: 10 }}>
+            {BGM_QUESTIONS[step].opts.map((o) => (
+              <button key={o.key} className="optbtn" style={optStyle} onClick={() => pick(o.key)}>
+                {o.label}
+              </button>
+            ))}
+          </div>
+          <BackLink onClick={step === 0 ? onHome : () => setStep(step - 1)}>
+            {step === 0 ? "← 最初の選択に戻る" : "← ひとつ前に戻る"}
+          </BackLink>
+        </div>
+      ) : (
+        <div className="fadein">
+          <div style={{ background: C.paper, border: `1px solid ${C.border}`, borderRadius: 16, padding: "28px 22px", textAlign: "center" }}>
+            <Wave />
+            <p style={{ letterSpacing: "0.3em", fontSize: 10, color: C.accent, margin: 0 }}>{result.en}</p>
+            <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 22, fontWeight: 600, margin: "8px 0 14px", letterSpacing: "0.05em" }}>
+              {result.name}
+            </h2>
+            <p style={{ fontSize: 13.5, lineHeight: 2, color: "#4c463f", textAlign: "left", margin: "0 0 14px" }}>
+              {result.desc}
+            </p>
+            <div style={{ background: C.bg, borderRadius: 10, padding: "12px 14px", textAlign: "left", fontSize: 12.5, lineHeight: 1.9, color: "#5c554d" }}>
+              <p style={{ margin: 0 }}><b style={{ color: C.accent }}>曲調</b>|{result.spec}</p>
+              <p style={{ margin: "6px 0 0" }}>
+                <b style={{ color: C.accent }}>おふたりへ</b>|{BGM_SCENE_NOTE[answers[0]]}{BGM_VENUE_NOTE[answers[1]]}
+              </p>
+            </div>
+
+            <SamplePlayer key={diag.firstType} src={AUDIO[diag.firstType]} label="SAMPLE(30秒)" />
+
+            <p style={{ fontSize: 11.5, color: "#8a8177", marginTop: 14, textAlign: "left" }}>
+              次に近いタイプは「{second.name}」でした。「もう一度診断する」から別の答え方も試してみてください。
+            </p>
+          </div>
+
+          <p style={{ fontSize: 12, lineHeight: 1.9, color: "#5c554d", textAlign: "center", margin: "18px 0 0" }}>
+            Muse Movieでは、市販曲ではなく<b>おふたりのためだけに作曲したオリジナルBGM</b>を<br />ムービーとセットでお届けしています。
+          </p>
+
+          <Cta buttonText="この曲調で、おふたりだけの一曲を作る" />
+
+          <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 18 }}>
+            <button onClick={restart}
+              style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
+              もう一度診断する
+            </button>
+            <button onClick={onHome}
+              style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
+              最初の選択に戻る
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ================================================================
+// 体験②:手紙が歌になるミニ体験(レタームービー向け)
+// ================================================================
+const FEELINGS = {
+  thanks: {
+    label: "ありがとう",
+    en: "THANK YOU",
+    desc: "あたりまえだった毎日への感謝を、まっすぐ伝える一曲。",
+    lyrics: [
+      "あたりまえだった 毎日の中に",
+      "ずっと隠れてた あなたの優しさ",
+      "言葉じゃ足りないけど",
+      "「ありがとう」を今 歌にして贈るよ",
+    ],
+  },
+  sorry: {
+    label: "ごめんね",
+    en: "I'M SORRY",
+    desc: "素直になれなかった気持ちに、そっと寄り添う一曲。",
+    lyrics: [
+      "素直になれずに 傷つけたことも",
+      "本当は全部 覚えているよ",
+      "ごめんね それから ありがとう",
+      "今日はこの歌に 込めて渡すね",
+    ],
+  },
+  watch: {
+    label: "見守っていてね",
+    en: "WATCH OVER ME",
+    desc: "これからも見ていてほしい、そんな願いを込めた一曲。",
+    lyrics: [
+      "呼び方が変わっても 私は私のまま",
+      "遠くにいても いつも繋がってる",
+      "どうか安心して 笑っていて",
+      "これからもずっと 見守っていてね",
+    ],
+  },
+  love: {
+    label: "大好き",
+    en: "I LOVE YOU",
+    desc: "照れくさくて言えなかった一言を、今日だけは伝える一曲。",
+    lyrics: [
+      "照れくさくて ずっと言えなかった",
+      "今日だけは伝えるね 素直な気持ち",
+      "生まれてきてよかった あなたの子で",
+      "心から 大好きだよ",
+    ],
+  },
+};
+
+const TEGAMI_QUESTIONS = [
+  {
+    q: "親御さんとの思い出で、いちばん胸が熱くなるのは？",
+    opts: [
+      { label: "毎日のお弁当や、送り迎えの時間", key: "daily", pts: { thanks: 2, love: 1 } },
+      { label: "反抗して、うまく話せなかった時期", key: "conflict", pts: { sorry: 2 } },
+      { label: "家を出た日、見送ってくれた背中", key: "leaving", pts: { watch: 2 } },
+      { label: "なんでも話せる、友達みたいな関係", key: "friend", pts: { love: 2, thanks: 1 } },
+    ],
+  },
+  {
+    q: "手紙の結びに書きたい一言は？",
+    opts: [
+      { label: "ありがとう", key: "thanks", pts: { thanks: 3 } },
+      { label: "ごめんね", key: "sorry", pts: { sorry: 3 } },
+      { label: "見守っていてね", key: "watch", pts: { watch: 3 } },
+      { label: "大好き", key: "love", pts: { love: 3 } },
+    ],
+  },
+];
+
+const MEMORY_NOTE = {
+  daily: "何気ない毎日こそ、いちばんの宝物だったこと。歌にすると、それがまっすぐ伝わります。",
+  conflict: "うまく言えなかった時間があるからこそ、今日の言葉は深く届きます。",
+  leaving: "見送ってくれたあの日の気持ちに、今度はあなたが応える番です。",
+  friend: "近すぎて照れくさい関係だからこそ、歌なら素直に伝えられます。",
+};
+
+function tegamiDiagnose(answers) {
+  const score = { thanks: 0, sorry: 0, watch: 0, love: 0 };
+  answers.forEach((ansKey, qi) => {
+    const opt = TEGAMI_QUESTIONS[qi].opts.find((o) => o.key === ansKey);
+    if (!opt) return;
+    for (const [type, p] of Object.entries(opt.pts)) score[type] += p;
+  });
+  const sorted = Object.entries(score).sort((a, b) => b[1] - a[1]);
+  let firstType = sorted[0][0];
+  const firstPts = sorted[0][1];
+  const closing = answers[1];
+  if (closing && score[closing] === firstPts) firstType = closing;
+  return firstType;
+}
+
+function TegamiFlow({ onHome }) {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const total = TEGAMI_QUESTIONS.length;
+
+  const pick = (key) => {
+    const next = [...answers];
+    next[step] = key;
+    setAnswers(next);
+    setStep(step + 1);
+  };
+  const restart = () => { setAnswers([]); setStep(0); };
+
+  const resultKey = step === total ? tegamiDiagnose(answers) : null;
+  const result = resultKey ? FEELINGS[resultKey] : null;
+
+  return (
+    <div>
+      <header style={{ textAlign: "center", marginBottom: 26 }}>
+        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>MUSE MOVIE</p>
+        <h1 style={{ fontFamily: "'Noto Serif JP', serif", fontWeight: 600, fontSize: 24, margin: "10px 0 8px", letterSpacing: "0.08em" }}>
+          手紙が、歌になる。<br />ミニ体験
+        </h1>
+        <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 12px" }} />
+        <p style={{ fontSize: 13, lineHeight: 1.9, color: "#5c554d", margin: 0 }}>
+          2つの質問に答えると、あなたの気持ちに合う<br />
+          「手紙の歌」を歌詞と一緒にその場で聴けます。
+        </p>
+      </header>
+
+      <Dots total={total} step={step} />
+
+      {step < total ? (
+        <div className="fadein" key={step}>
+          <p style={{ textAlign: "center", fontSize: 12, color: C.accent, letterSpacing: "0.2em", margin: "0 0 6px" }}>
+            Q{step + 1} / {total}
+          </p>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 18, fontWeight: 600, textAlign: "center", margin: "0 0 20px", lineHeight: 1.7 }}>
+            {TEGAMI_QUESTIONS[step].q}
+          </h2>
+          <div style={{ display: "grid", gap: 10 }}>
+            {TEGAMI_QUESTIONS[step].opts.map((o) => (
+              <button key={o.key} className="optbtn" style={optStyle} onClick={() => pick(o.key)}>
+                {o.label}
+              </button>
+            ))}
+          </div>
+          <BackLink onClick={step === 0 ? onHome : () => setStep(step - 1)}>
+            {step === 0 ? "← 最初の選択に戻る" : "← ひとつ前に戻る"}
+          </BackLink>
+        </div>
+      ) : (
+        <div className="fadein">
+          <div style={{ background: C.paper, border: `1px solid ${C.border}`, borderRadius: 16, padding: "28px 22px", textAlign: "center" }}>
+            <Wave />
+            <p style={{ letterSpacing: "0.3em", fontSize: 10, color: C.accent, margin: 0 }}>{result.en}</p>
+            <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 21, fontWeight: 600, margin: "8px 0 6px", letterSpacing: "0.05em" }}>
+              あなたの手紙は「{result.label}」の歌
+            </h2>
+            <p style={{ fontSize: 13.5, lineHeight: 1.9, color: "#4c463f", margin: "0 0 6px" }}>
+              {result.desc}
+            </p>
+            <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "#5c554d", textAlign: "left", margin: "10px 0 0" }}>
+              {MEMORY_NOTE[answers[0]]}
+            </p>
+
+            {/* 便箋風の歌詞プレビュー */}
+            <div style={{
+              marginTop: 18,
+              background: `repeating-linear-gradient(${C.paper}, ${C.paper} 37px, #EDE2DA 37px, #EDE2DA 38px)`,
+              border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 18px 16px",
+            }}>
+              <p style={{ letterSpacing: "0.3em", fontSize: 10, color: C.accent, margin: "0 0 10px", textAlign: "center" }}>
+                ── サビの歌詞 ──
+              </p>
+              {result.lyrics.map((line, i) => (
+                <p key={i} className="lyricline"
+                  style={{
+                    fontFamily: "'Noto Serif JP', serif", fontSize: 15, lineHeight: "38px",
+                    margin: 0, letterSpacing: "0.04em", textAlign: "left",
+                    animationDelay: `${0.3 + i * 0.4}s`,
+                  }}>
+                  {line}
+                </p>
+              ))}
+            </div>
+
+            <SamplePlayer key={resultKey} src={AUDIO[resultKey]} label="この歌詞のサンプル曲" />
+
+            <p style={{ fontSize: 12, lineHeight: 1.9, color: "#5c554d", textAlign: "left", marginTop: 16 }}>
+              これは代表例としてお作りした一曲です。実際の制作では、<b>あなたが書いた手紙の言葉をそのまま歌詞にして</b>、世界にひとつの一曲に仕上げます。
+            </p>
+          </div>
+
+          <Cta buttonText="手紙ソングについて相談する" />
+
+          <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 18 }}>
+            <button onClick={restart}
+              style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
+              もう一度診断する
+            </button>
+            <button onClick={onHome}
+              style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
+              最初の選択に戻る
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ================================================================
+// トップ:体験を選ぶ
+// ================================================================
+function Home({ onSelect }) {
+  const cards = [
+    {
+      key: "bgm",
+      en: "ORIGINAL BGM",
+      title: "オリジナルBGM ミニ体験",
+      desc: "プロフィールムービーをお考えの方へ。4つの質問で、おふたりに合うBGMを診断して試聴できます。",
+    },
+    {
+      key: "tegami",
+      en: "LETTER SONG",
+      title: "手紙が、歌になる。ミニ体験",
+      desc: "レタームービー(手紙の演出)が気になる方へ。気持ちに合う「手紙の歌」を歌詞と一緒に聴けます。",
+    },
+  ];
+  return (
+    <div>
+      <header style={{ textAlign: "center", marginBottom: 30 }}>
+        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>MUSE MOVIE</p>
+        <h1 style={{ fontFamily: "'Noto Serif JP', serif", fontWeight: 600, fontSize: 24, margin: "10px 0 8px", letterSpacing: "0.08em", lineHeight: 1.6 }}>
+          結婚式ムービーの音、<br />ミニ体験。
+        </h1>
+        <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 12px" }} />
+        <p style={{ fontSize: 13, lineHeight: 1.9, color: "#5c554d", margin: 0 }}>
+          気になるムービーを選ぶと、質問に合わせて<br />サンプル曲をその場で聴けます。
+        </p>
+      </header>
+
+      <div style={{ display: "grid", gap: 14 }}>
+        {cards.map((c) => (
+          <button key={c.key} className="optbtn" onClick={() => onSelect(c.key)}
+            style={{
+              background: C.paper, border: `1px solid ${C.border}`, borderRadius: 16,
+              padding: "22px 20px", textAlign: "left", cursor: "pointer", fontFamily: "inherit", width: "100%",
+            }}>
+            <p style={{ letterSpacing: "0.25em", fontSize: 10, color: C.accent, fontWeight: 700, margin: 0 }}>{c.en}</p>
+            <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 17.5, fontWeight: 600, color: C.ink, margin: "8px 0 8px", lineHeight: 1.6 }}>
+              {c.title}
+            </p>
+            <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "#5c554d", margin: 0 }}>
+              {c.desc}
+            </p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: C.accent, margin: "12px 0 0" }}>
+              体験してみる →
+            </p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ================================================================
+// アプリ本体
+// ================================================================
+function App() {
+  const [mode, setMode] = useState("home"); // home | bgm | tegami
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg, color: C.ink, fontFamily: "'Noto Sans JP', sans-serif" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        * { box-sizing: border-box; }
+        .fadein { animation: fadein .45s ease; }
+        @keyframes fadein { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
+        .optbtn { transition: background .15s ease, transform .1s ease; }
+        .optbtn:hover { background: #EBE1DA; }
+        .optbtn:active { transform: scale(.985); }
+        .lyricline { opacity: 0; animation: linein .7s ease forwards; }
+        @keyframes linein { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
+        @keyframes rise { from { transform: scaleY(.2);} to { transform: scaleY(1);} }
+        .bar { transform-origin: bottom; animation: rise .6s ease both; }
+        @media (prefers-reduced-motion: reduce) { .fadein, .bar { animation: none; } .lyricline { animation: none; opacity: 1; } }
+      `}</style>
+
+      <div style={{ maxWidth: 560, margin: "0 auto", padding: "40px 20px 64px" }}>
+        <div className="fadein" key={mode}>
+          {mode === "home" && <Home onSelect={setMode} />}
+          {mode === "bgm" && <BgmFlow onHome={() => setMode("home")} />}
+          {mode === "tegami" && <TegamiFlow onHome={() => setMode("home")} />}
+        </div>
+
+        <footer style={{ textAlign: "center", marginTop: 32, fontSize: 10.5, color: "#a39a8e", letterSpacing: "0.1em" }}>
+          © Muse Movie — emotional milestone designer
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
