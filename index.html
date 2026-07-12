@@ -3,15 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>結婚式ムービーの音、ミニ体験 | Muse Movie</title>
+<title>Muse Movie|ムービーに、世界にひとつの音を。</title>
+<meta name="description" content="結婚式のプロフィールムービーとオリジナルBGM、手紙がそのまま歌になるレターソング。Muse Movieの音づくりをミニ体験できます。" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>body{margin:0;}</style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel" data-presets="react">
-const { useState, useRef } = React;
+const { useState, useRef, useEffect } = React;
 
 // ================================================================
 // ▼ リンク設定(ここを書き換えるだけでOK)
@@ -33,23 +35,99 @@ const AUDIO = {
   love: "song-love.mp3",
 };
 
-// ================================================================
-// テーマカラー
-// ================================================================
+// ▼ プロフィール写真(任意)。index.htmlと同じ場所に profile.jpg を
+//   置くと自動で表示されます。無い場合はイラストが表示されます。
+const PROFILE_IMG = "profile.jpg";
+
 const C = {
   bg: "#EFE9E6",
   accent: "#CBA890",
+  accentDeep: "#B08F76",
   border: "#DDC9BB",
   ink: "#2D2A29",
+  sub: "#6B625B",
   paper: "#FBF8F6",
   panel: "#E8DCD5",
 };
 
 // ================================================================
+// スクロールで現れる演出
+// ================================================================
+function Reveal({ children, delay = 0 }) {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } });
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} style={{
+      opacity: on ? 1 : 0,
+      transform: on ? "none" : "translateY(24px)",
+      transition: `opacity .9s ease ${delay}s, transform .9s ease ${delay}s`,
+    }}>
+      {children}
+    </div>
+  );
+}
+
+// ================================================================
+// 装飾イラスト(SVG)
+// ================================================================
+function IllustBgm({ size = 150 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 150 150" fill="none">
+      <circle cx="75" cy="75" r="70" fill={C.panel} />
+      <path d="M55 100 V48 l40 -10 v52" stroke={C.accentDeep} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <circle cx="47" cy="100" r="10" fill={C.accent} />
+      <circle cx="87" cy="90" r="10" fill={C.accent} />
+      <path d="M22 66 q6 -8 12 0 q6 8 12 0" stroke={C.accent} strokeWidth="3.5" strokeLinecap="round" fill="none" />
+      <path d="M104 118 q6 -8 12 0 q6 8 12 0" stroke={C.border} strokeWidth="3.5" strokeLinecap="round" fill="none" />
+      <circle cx="118" cy="44" r="4" fill={C.border} />
+    </svg>
+  );
+}
+
+function IllustLetter({ size = 150 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 150 150" fill="none">
+      <circle cx="75" cy="75" r="70" fill={C.panel} />
+      <rect x="38" y="56" width="74" height="50" rx="7" fill={C.paper} stroke={C.accentDeep} strokeWidth="4" />
+      <path d="M40 60 L75 86 L110 60" stroke={C.accentDeep} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path d="M99 44 V26 l16 -4 v18" stroke={C.accent} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <circle cx="95" cy="44" r="5.5" fill={C.accent} />
+      <circle cx="111" cy="40" r="5.5" fill={C.accent} />
+      <path d="M30 38 q5 -7 10 0 q5 7 10 0" stroke={C.border} strokeWidth="3" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
+
+function IllustProfile({ size = 150 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 150 150" fill="none">
+      <circle cx="75" cy="75" r="70" fill={C.panel} />
+      <rect x="42" y="46" width="66" height="46" rx="8" fill={C.paper} stroke={C.accentDeep} strokeWidth="4" />
+      <circle cx="75" cy="69" r="11" fill="none" stroke={C.accent} strokeWidth="4" />
+      <circle cx="97" cy="55" r="3" fill={C.accent} />
+      <path d="M60 104 h30" stroke={C.accentDeep} strokeWidth="4" strokeLinecap="round" />
+      <path d="M68 92 v12 M82 92 v12" stroke={C.accentDeep} strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+// ================================================================
 // 共通:サンプル再生プレーヤー
 // ================================================================
 function SamplePlayer({ src, label }) {
-  const [state, setState] = useState("idle"); // idle | loading | playing | error
+  const [state, setState] = useState("idle");
   const [progress, setProgress] = useState(0);
   const audioRef = useRef(null);
 
@@ -63,31 +141,20 @@ function SamplePlayer({ src, label }) {
       setState("error");
     }
   };
-
   const pause = () => {
     if (!audioRef.current) return;
     audioRef.current.pause();
     setState("idle");
   };
 
-  if (!src) {
-    return <p style={{ fontSize: 12, color: "#8a8177", marginTop: 14 }}>試聴サンプルはただいま準備中です。</p>;
-  }
-  if (state === "error") {
-    return <p style={{ fontSize: 12, color: "#8a8177", marginTop: 14 }}>お使いの環境では再生できませんでした。Instagramでサンプルを公開しています。</p>;
-  }
+  if (!src) return <p style={{ fontSize: 12, color: "#8a8177", marginTop: 14 }}>試聴サンプルはただいま準備中です。</p>;
+  if (state === "error") return <p style={{ fontSize: 12, color: "#8a8177", marginTop: 14 }}>お使いの環境では再生できませんでした。Instagramでサンプルを公開しています。</p>;
 
   return (
     <div style={{ marginTop: 14 }}>
       <audio
-        ref={audioRef}
-        src={src}
-        preload="none"
-        playsInline
-        onTimeUpdate={(e) => {
-          const el = e.currentTarget;
-          if (el.duration) setProgress(el.currentTime / el.duration);
-        }}
+        ref={audioRef} src={src} preload="none" playsInline
+        onTimeUpdate={(e) => { const el = e.currentTarget; if (el.duration) setProgress(el.currentTime / el.duration); }}
         onEnded={() => { setProgress(0); setState("idle"); }}
         onError={() => setState("error")}
         style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
@@ -96,9 +163,7 @@ function SamplePlayer({ src, label }) {
         display: "flex", alignItems: "center", gap: 12,
         background: C.bg, border: `1px solid ${C.border}`, borderRadius: 999, padding: "8px 16px 8px 8px",
       }}>
-        <button
-          onClick={state === "playing" ? pause : play}
-          aria-label={state === "playing" ? "一時停止" : "再生"}
+        <button onClick={state === "playing" ? pause : play} aria-label={state === "playing" ? "一時停止" : "再生"}
           style={{
             width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
             background: C.accent, border: "none", cursor: "pointer",
@@ -113,9 +178,7 @@ function SamplePlayer({ src, label }) {
           )}
         </button>
         <div style={{ flex: 1 }}>
-          <p style={{ fontSize: 11, color: C.accent, letterSpacing: "0.15em", margin: "0 0 5px", textAlign: "left" }}>
-            {label}
-          </p>
+          <p style={{ fontSize: 11, color: C.accent, letterSpacing: "0.15em", margin: "0 0 5px", textAlign: "left" }}>{label}</p>
           <div style={{ height: 5, background: "#E4D8CE", borderRadius: 999, overflow: "hidden" }}>
             <div style={{ width: `${progress * 100}%`, height: "100%", background: C.accent, borderRadius: 999, transition: "width .1s linear" }} />
           </div>
@@ -129,48 +192,7 @@ function SamplePlayer({ src, label }) {
 }
 
 // ================================================================
-// 共通:CTA(Muse Movie紹介)
-// ================================================================
-function Cta({ buttonText }) {
-  return (
-    <div style={{ marginTop: 24, padding: "24px 20px", background: C.panel, borderRadius: 16 }}>
-      <p style={{ letterSpacing: "0.25em", fontSize: 11, color: C.accent, fontWeight: 700, margin: 0 }}>MUSE MOVIE</p>
-      <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 16.5, fontWeight: 600, margin: "10px 0 10px", lineHeight: 1.7, textAlign: "left" }}>
-        結婚式ムービーを制作しています
-      </p>
-      <p style={{ fontSize: 13, lineHeight: 2, color: C.ink, textAlign: "left", margin: "0 0 18px" }}>
-        プロフィールムービーやエンドロール、両親への手紙がそのまま一曲の歌になる「レターソング」など、おふたりのためだけのムービーとオリジナル楽曲をお作りしています。
-        <br />
-        ムービーのことでお手伝いできることがあれば、お気軽にご相談ください。
-      </p>
-      <div style={{ display: "grid", gap: 10 }}>
-        <a href={LINKS.coconala} target="_blank" rel="noreferrer"
-          style={{
-            display: "block", textAlign: "center", background: C.accent, color: "#fff",
-            borderRadius: 999, padding: "14px 16px", fontSize: 14, fontWeight: 700, textDecoration: "none",
-          }}>
-          {buttonText}
-        </a>
-        <a href={LINKS.instagram} target="_blank" rel="noreferrer"
-          style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            background: "transparent", color: C.ink, border: `1.5px solid ${C.accent}`,
-            borderRadius: 999, padding: "12px 16px", fontSize: 13.5, fontWeight: 700, textDecoration: "none",
-          }}>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="1.8">
-            <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" />
-            <circle cx="12" cy="12" r="4.3" />
-            <circle cx="17.4" cy="6.6" r="1.1" fill={C.accent} stroke="none" />
-          </svg>
-          Instagramで作品を見る
-        </a>
-      </div>
-    </div>
-  );
-}
-
-// ================================================================
-// 共通:UIパーツ
+// 共通UIパーツ
 // ================================================================
 function Dots({ total, step }) {
   return (
@@ -214,31 +236,62 @@ function BackLink({ onClick, children }) {
   );
 }
 
+function Cta({ buttonText }) {
+  return (
+    <div style={{ marginTop: 24, padding: "24px 20px", background: C.panel, borderRadius: 16 }}>
+      <p style={{ letterSpacing: "0.25em", fontSize: 11, color: C.accentDeep, fontWeight: 700, margin: 0 }}>MUSE MOVIE</p>
+      <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 16.5, fontWeight: 600, margin: "10px 0 10px", lineHeight: 1.7, textAlign: "left" }}>
+        結婚式ムービーを制作しています
+      </p>
+      <p style={{ fontSize: 13, lineHeight: 2, color: C.ink, textAlign: "left", margin: "0 0 18px" }}>
+        プロフィールムービーやエンドロール、両親への手紙がそのまま一曲の歌になる「レターソング」など、おふたりのためだけのムービーとオリジナル楽曲をお作りしています。
+        <br />
+        ムービーのことでお手伝いできることがあれば、お気軽にご相談ください。
+      </p>
+      <div style={{ display: "grid", gap: 10 }}>
+        <a href={LINKS.coconala} target="_blank" rel="noreferrer"
+          style={{ display: "block", textAlign: "center", background: C.accent, color: "#fff", borderRadius: 999, padding: "14px 16px", fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
+          {buttonText}
+        </a>
+        <a href={LINKS.instagram} target="_blank" rel="noreferrer"
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            background: "transparent", color: C.ink, border: `1.5px solid ${C.accent}`,
+            borderRadius: 999, padding: "12px 16px", fontSize: 13.5, fontWeight: 700, textDecoration: "none",
+          }}>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="1.8">
+            <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" />
+            <circle cx="12" cy="12" r="4.3" />
+            <circle cx="17.4" cy="6.6" r="1.1" fill={C.accent} stroke="none" />
+          </svg>
+          Instagramで作品を見る
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ================================================================
-// 体験①:オリジナルBGM診断(プロフィールムービー向け)
+// 体験①:オリジナルBGM診断
 // ================================================================
 const BGM_RESULTS = {
   emotional: {
-    name: "しっとり感動バラード",
-    en: "EMOTIONAL BALLAD",
+    name: "しっとり感動バラード", en: "EMOTIONAL BALLAD",
     desc: "ピアノの一音一音が言葉のように響く、涙腺にそっと触れるタイプ。後半でストリングスが重なり、会場全体が静かにひとつになります。",
     spec: "ピアノ主体/BPM 70〜90/サビで弦が広がる構成",
   },
   pop: {
-    name: "ハートフル・ポップ",
-    en: "HEARTFUL POP",
+    name: "ハートフル・ポップ", en: "HEARTFUL POP",
     desc: "アコースティックギターと手拍子が弾む、思わず笑顔になるタイプ。ゲストの緊張がほどけて、写真の切り替えも軽やかに見えます。",
     spec: "アコギ+クラップ/BPM 110〜125/明るいメジャーコード",
   },
   cinematic: {
-    name: "シネマティック・オーケストラ",
-    en: "CINEMATIC",
+    name: "シネマティック・オーケストラ", en: "CINEMATIC",
     desc: "静かなピアノから始まり、映画の予告編のように壮大に盛り上がるタイプ。ここぞという場面の期待感を最大まで高めます。",
     spec: "ピアノ×ストリングス/静→壮大のビルドアップ構成",
   },
   natural: {
-    name: "ナチュラル・アコースティック",
-    en: "NATURAL ACOUSTIC",
+    name: "ナチュラル・アコースティック", en: "NATURAL ACOUSTIC",
     desc: "木漏れ日のようなあたたかさのタイプ。アコギやウクレレの生楽器が寄り添い、日常の写真がそのまま愛おしく見えます。",
     spec: "アコギ・ウクレレ・ハミング/BPM 90〜105",
   },
@@ -330,14 +383,14 @@ function BgmFlow({ onHome }) {
   const second = diag ? BGM_RESULTS[diag.secondType] : null;
 
   return (
-    <div>
+    <div style={{ maxWidth: 560, margin: "0 auto", padding: "96px 20px 64px" }}>
       <header style={{ textAlign: "center", marginBottom: 26 }}>
-        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>MUSE MOVIE</p>
+        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>ORIGINAL BGM</p>
         <h1 style={{ fontFamily: "'Noto Serif JP', serif", fontWeight: 600, fontSize: 24, margin: "10px 0 8px", letterSpacing: "0.08em" }}>
           オリジナルBGM<br />ミニ体験
         </h1>
         <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 12px" }} />
-        <p style={{ fontSize: 13, lineHeight: 1.9, color: "#5c554d", margin: 0 }}>
+        <p style={{ fontSize: 13, lineHeight: 1.9, color: C.sub, margin: 0 }}>
           4つの質問で、おふたりのムービーに合う<br />BGMを診断して、その場で試聴できます。
         </p>
       </header>
@@ -360,7 +413,7 @@ function BgmFlow({ onHome }) {
             ))}
           </div>
           <BackLink onClick={step === 0 ? onHome : () => setStep(step - 1)}>
-            {step === 0 ? "← 最初の選択に戻る" : "← ひとつ前に戻る"}
+            {step === 0 ? "← トップに戻る" : "← ひとつ前に戻る"}
           </BackLink>
         </div>
       ) : (
@@ -374,10 +427,10 @@ function BgmFlow({ onHome }) {
             <p style={{ fontSize: 13.5, lineHeight: 2, color: "#4c463f", textAlign: "left", margin: "0 0 14px" }}>
               {result.desc}
             </p>
-            <div style={{ background: C.bg, borderRadius: 10, padding: "12px 14px", textAlign: "left", fontSize: 12.5, lineHeight: 1.9, color: "#5c554d" }}>
-              <p style={{ margin: 0 }}><b style={{ color: C.accent }}>曲調</b>|{result.spec}</p>
+            <div style={{ background: C.bg, borderRadius: 10, padding: "12px 14px", textAlign: "left", fontSize: 12.5, lineHeight: 1.9, color: C.sub }}>
+              <p style={{ margin: 0 }}><b style={{ color: C.accentDeep }}>曲調</b>|{result.spec}</p>
               <p style={{ margin: "6px 0 0" }}>
-                <b style={{ color: C.accent }}>おふたりへ</b>|{BGM_SCENE_NOTE[answers[0]]}{BGM_VENUE_NOTE[answers[1]]}
+                <b style={{ color: C.accentDeep }}>おふたりへ</b>|{BGM_SCENE_NOTE[answers[0]]}{BGM_VENUE_NOTE[answers[1]]}
               </p>
             </div>
 
@@ -388,7 +441,7 @@ function BgmFlow({ onHome }) {
             </p>
           </div>
 
-          <p style={{ fontSize: 12, lineHeight: 1.9, color: "#5c554d", textAlign: "center", margin: "18px 0 0" }}>
+          <p style={{ fontSize: 12, lineHeight: 1.9, color: C.sub, textAlign: "center", margin: "18px 0 0" }}>
             Muse Movieでは、市販曲ではなく<b>おふたりのためだけに作曲したオリジナルBGM</b>を<br />ムービーとセットでお届けしています。
           </p>
 
@@ -401,7 +454,7 @@ function BgmFlow({ onHome }) {
             </button>
             <button onClick={onHome}
               style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
-              最初の選択に戻る
+              トップに戻る
             </button>
           </div>
         </div>
@@ -411,52 +464,28 @@ function BgmFlow({ onHome }) {
 }
 
 // ================================================================
-// 体験②:手紙が歌になるミニ体験(レタームービー向け)
+// 体験②:手紙が歌になる
 // ================================================================
 const FEELINGS = {
   thanks: {
-    label: "ありがとう",
-    en: "THANK YOU",
+    label: "ありがとう", en: "THANK YOU",
     desc: "あたりまえだった毎日への感謝を、まっすぐ伝える一曲。",
-    lyrics: [
-      "あたりまえだった 毎日の中に",
-      "ずっと隠れてた あなたの優しさ",
-      "言葉じゃ足りないけど",
-      "「ありがとう」を今 歌にして贈るよ",
-    ],
+    lyrics: ["あたりまえだった 毎日の中に", "ずっと隠れてた あなたの優しさ", "言葉じゃ足りないけど", "「ありがとう」を今 歌にして贈るよ"],
   },
   sorry: {
-    label: "ごめんね",
-    en: "I'M SORRY",
+    label: "ごめんね", en: "I'M SORRY",
     desc: "素直になれなかった気持ちに、そっと寄り添う一曲。",
-    lyrics: [
-      "素直になれずに 傷つけたことも",
-      "本当は全部 覚えているよ",
-      "ごめんね それから ありがとう",
-      "今日はこの歌に 込めて渡すね",
-    ],
+    lyrics: ["素直になれずに 傷つけたことも", "本当は全部 覚えているよ", "ごめんね それから ありがとう", "今日はこの歌に 込めて渡すね"],
   },
   watch: {
-    label: "見守っていてね",
-    en: "WATCH OVER ME",
+    label: "見守っていてね", en: "WATCH OVER ME",
     desc: "これからも見ていてほしい、そんな願いを込めた一曲。",
-    lyrics: [
-      "呼び方が変わっても 私は私のまま",
-      "遠くにいても いつも繋がってる",
-      "どうか安心して 笑っていて",
-      "これからもずっと 見守っていてね",
-    ],
+    lyrics: ["呼び方が変わっても 私は私のまま", "遠くにいても いつも繋がってる", "どうか安心して 笑っていて", "これからもずっと 見守っていてね"],
   },
   love: {
-    label: "大好き",
-    en: "I LOVE YOU",
+    label: "大好き", en: "I LOVE YOU",
     desc: "照れくさくて言えなかった一言を、今日だけは伝える一曲。",
-    lyrics: [
-      "照れくさくて ずっと言えなかった",
-      "今日だけは伝えるね 素直な気持ち",
-      "生まれてきてよかった あなたの子で",
-      "心から 大好きだよ",
-    ],
+    lyrics: ["照れくさくて ずっと言えなかった", "今日だけは伝えるね 素直な気持ち", "生まれてきてよかった あなたの子で", "心から 大好きだよ"],
   },
 };
 
@@ -520,14 +549,14 @@ function TegamiFlow({ onHome }) {
   const result = resultKey ? FEELINGS[resultKey] : null;
 
   return (
-    <div>
+    <div style={{ maxWidth: 560, margin: "0 auto", padding: "96px 20px 64px" }}>
       <header style={{ textAlign: "center", marginBottom: 26 }}>
-        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>MUSE MOVIE</p>
+        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>LETTER SONG</p>
         <h1 style={{ fontFamily: "'Noto Serif JP', serif", fontWeight: 600, fontSize: 24, margin: "10px 0 8px", letterSpacing: "0.08em" }}>
           手紙が、歌になる。<br />ミニ体験
         </h1>
         <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 12px" }} />
-        <p style={{ fontSize: 13, lineHeight: 1.9, color: "#5c554d", margin: 0 }}>
+        <p style={{ fontSize: 13, lineHeight: 1.9, color: C.sub, margin: 0 }}>
           2つの質問に答えると、あなたの気持ちに合う<br />
           「手紙の歌」を歌詞と一緒にその場で聴けます。
         </p>
@@ -551,7 +580,7 @@ function TegamiFlow({ onHome }) {
             ))}
           </div>
           <BackLink onClick={step === 0 ? onHome : () => setStep(step - 1)}>
-            {step === 0 ? "← 最初の選択に戻る" : "← ひとつ前に戻る"}
+            {step === 0 ? "← トップに戻る" : "← ひとつ前に戻る"}
           </BackLink>
         </div>
       ) : (
@@ -565,11 +594,10 @@ function TegamiFlow({ onHome }) {
             <p style={{ fontSize: 13.5, lineHeight: 1.9, color: "#4c463f", margin: "0 0 6px" }}>
               {result.desc}
             </p>
-            <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "#5c554d", textAlign: "left", margin: "10px 0 0" }}>
+            <p style={{ fontSize: 12.5, lineHeight: 1.9, color: C.sub, textAlign: "left", margin: "10px 0 0" }}>
               {MEMORY_NOTE[answers[0]]}
             </p>
 
-            {/* 便箋風の歌詞プレビュー */}
             <div style={{
               marginTop: 18,
               background: `repeating-linear-gradient(${C.paper}, ${C.paper} 37px, #EDE2DA 37px, #EDE2DA 38px)`,
@@ -592,7 +620,7 @@ function TegamiFlow({ onHome }) {
 
             <SamplePlayer key={resultKey} src={AUDIO[resultKey]} label="この歌詞のサンプル曲" />
 
-            <p style={{ fontSize: 12, lineHeight: 1.9, color: "#5c554d", textAlign: "left", marginTop: 16 }}>
+            <p style={{ fontSize: 12, lineHeight: 1.9, color: C.sub, textAlign: "left", marginTop: 16 }}>
               これは代表例としてお作りした一曲です。実際の制作では、<b>あなたが書いた手紙の言葉をそのまま歌詞にして</b>、世界にひとつの一曲に仕上げます。
             </p>
           </div>
@@ -606,7 +634,7 @@ function TegamiFlow({ onHome }) {
             </button>
             <button onClick={onHome}
               style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
-              最初の選択に戻る
+              トップに戻る
             </button>
           </div>
         </div>
@@ -616,56 +644,205 @@ function TegamiFlow({ onHome }) {
 }
 
 // ================================================================
-// トップ:体験を選ぶ
+// トップページ(縦スクロールのランディング)
 // ================================================================
-function Home({ onSelect }) {
-  const cards = [
-    {
-      key: "bgm",
-      en: "ORIGINAL BGM",
-      title: "オリジナルBGM ミニ体験",
-      desc: "プロフィールムービーをお考えの方へ。4つの質問で、おふたりに合うBGMを診断して試聴できます。",
-    },
-    {
-      key: "tegami",
-      en: "LETTER SONG",
-      title: "手紙が、歌になる。ミニ体験",
-      desc: "レタームービー(手紙の演出)が気になる方へ。気持ちに合う「手紙の歌」を歌詞と一緒に聴けます。",
-    },
-  ];
+function Landing({ onSelect }) {
+  const [imgOk, setImgOk] = useState(true);
+
+  const scrollTo = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div>
-      <header style={{ textAlign: "center", marginBottom: 30 }}>
-        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>MUSE MOVIE</p>
-        <h1 style={{ fontFamily: "'Noto Serif JP', serif", fontWeight: 600, fontSize: 24, margin: "10px 0 8px", letterSpacing: "0.08em", lineHeight: 1.6 }}>
-          結婚式ムービーの音、<br />ミニ体験。
-        </h1>
-        <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 12px" }} />
-        <p style={{ fontSize: 13, lineHeight: 1.9, color: "#5c554d", margin: 0 }}>
-          気になるムービーを選ぶと、質問に合わせて<br />サンプル曲をその場で聴けます。
-        </p>
-      </header>
-
-      <div style={{ display: "grid", gap: 14 }}>
-        {cards.map((c) => (
-          <button key={c.key} className="optbtn" onClick={() => onSelect(c.key)}
-            style={{
-              background: C.paper, border: `1px solid ${C.border}`, borderRadius: 16,
-              padding: "22px 20px", textAlign: "left", cursor: "pointer", fontFamily: "inherit", width: "100%",
+      {/* ヒーロー */}
+      <section style={{ minHeight: "88vh", display: "flex", alignItems: "center", padding: "110px 24px 60px" }}>
+        <div style={{ maxWidth: 640, margin: "0 auto", width: "100%" }}>
+          <Reveal>
+            <p style={{ letterSpacing: "0.35em", fontSize: 11.5, color: C.accentDeep, fontWeight: 700, margin: "0 0 22px" }}>
+              WEDDING MOVIE & ORIGINAL MUSIC
+            </p>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <h1 style={{
+              fontFamily: "'Noto Serif JP', serif", fontWeight: 600,
+              fontSize: "clamp(30px, 8vw, 44px)", lineHeight: 1.75, letterSpacing: "0.14em",
+              margin: "0 0 26px",
             }}>
-            <p style={{ letterSpacing: "0.25em", fontSize: 10, color: C.accent, fontWeight: 700, margin: 0 }}>{c.en}</p>
-            <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 17.5, fontWeight: 600, color: C.ink, margin: "8px 0 8px", lineHeight: 1.6 }}>
-              {c.title}
+              ムービーに、<br />
+              世界にひとつの<br />
+              音を。
+            </h1>
+          </Reveal>
+          <Reveal delay={0.3}>
+            <p style={{ fontSize: 14, lineHeight: 2.3, color: C.sub, margin: "0 0 34px", letterSpacing: "0.05em" }}>
+              おふたりの物語や、両親への手紙。<br />
+              大切な言葉が、そのまま一曲の歌になる。<br />
+              Muse Movieの音づくりを、2つのミニ体験でどうぞ。
             </p>
-            <p style={{ fontSize: 12.5, lineHeight: 1.9, color: "#5c554d", margin: 0 }}>
-              {c.desc}
+          </Reveal>
+          <Reveal delay={0.45}>
+            <button onClick={() => scrollTo("taiken")}
+              style={{
+                background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+                color: C.accentDeep, fontSize: 11, letterSpacing: "0.3em", padding: 0,
+              }}>
+              SCROLL
+              <span className="scrolldot" style={{ display: "block", width: 1.5, height: 44, background: C.accent }} />
+            </button>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ミニ体験 */}
+      <section id="taiken" style={{ padding: "72px 24px", background: C.paper }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <Reveal>
+            <p style={{ letterSpacing: "0.3em", fontSize: 11, color: C.accentDeep, fontWeight: 700, margin: 0, textAlign: "center" }}>EXPERIENCE</p>
+            <h2 style={{
+              fontFamily: "'Noto Serif JP', serif", fontWeight: 600, textAlign: "center",
+              fontSize: "clamp(24px, 6vw, 30px)", letterSpacing: "0.14em", lineHeight: 1.8, margin: "14px 0 14px",
+            }}>
+              音を、ミニ体験する
+            </h2>
+            <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 48px" }} />
+          </Reveal>
+
+          {/* 体験1 */}
+          <Reveal>
+            <div style={{ textAlign: "center", marginBottom: 64 }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+                <IllustBgm />
+              </div>
+              <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 20, fontWeight: 600, letterSpacing: "0.1em", lineHeight: 1.8, margin: "0 0 14px" }}>
+                プロフィールムービーに<br />オリジナルBGMを
+              </h3>
+              <p style={{ fontSize: 13.5, lineHeight: 2.2, color: C.sub, textAlign: "left", margin: "0 0 22px" }}>
+                Muse Movieのプロフィールムービーは、市販曲ではなく、おふたりのためだけに作曲したオリジナルBGMでお作りします。4つの質問に答えると、おふたりに合う曲調を診断して、実際のサンプル曲をその場で試聴できます。
+              </p>
+              <button onClick={() => onSelect("bgm")} className="optbtn"
+                style={{
+                  background: C.accent, color: "#fff", border: "none", borderRadius: 999,
+                  padding: "15px 40px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                }}>
+                BGM診断をやってみる
+              </button>
+            </div>
+          </Reveal>
+
+          {/* 体験2 */}
+          <Reveal>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+                <IllustLetter />
+              </div>
+              <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 20, fontWeight: 600, letterSpacing: "0.1em", lineHeight: 1.8, margin: "0 0 14px" }}>
+                レタームービーは<br />手紙が、歌になる
+              </h3>
+              <p style={{ fontSize: 13.5, lineHeight: 2.2, color: C.sub, textAlign: "left", margin: "0 0 22px" }}>
+                両親への手紙を、言い換えず、そのままの言葉で歌詞にして一曲に仕上げる「レターソング」。2つの質問に答えると、あなたの気持ちに合う手紙の歌を、歌詞と一緒にその場で聴けます。
+              </p>
+              <button onClick={() => onSelect("tegami")} className="optbtn"
+                style={{
+                  background: C.accent, color: "#fff", border: "none", borderRadius: 999,
+                  padding: "15px 40px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                }}>
+                手紙の歌を聴いてみる
+              </button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* つくる人 */}
+      <section id="about" style={{ padding: "72px 24px" }}>
+        <div style={{ maxWidth: 640, margin: "0 auto" }}>
+          <Reveal>
+            <p style={{ letterSpacing: "0.3em", fontSize: 11, color: C.accentDeep, fontWeight: 700, margin: 0, textAlign: "center" }}>ABOUT</p>
+            <h2 style={{
+              fontFamily: "'Noto Serif JP', serif", fontWeight: 600, textAlign: "center",
+              fontSize: "clamp(24px, 6vw, 30px)", letterSpacing: "0.14em", lineHeight: 1.8, margin: "14px 0 14px",
+            }}>
+              つくる人
+            </h2>
+            <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 40px" }} />
+          </Reveal>
+
+          <Reveal>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 22 }}>
+              {imgOk ? (
+                <img src={PROFILE_IMG} alt="Muse Movie"
+                  onError={() => setImgOk(false)}
+                  style={{ width: 150, height: 150, borderRadius: "50%", objectFit: "cover", border: `1px solid ${C.border}` }} />
+              ) : (
+                <IllustProfile />
+              )}
+            </div>
+            <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 18, fontWeight: 600, textAlign: "center", letterSpacing: "0.1em", margin: "0 0 18px" }}>
+              Muse Movie
             </p>
-            <p style={{ fontSize: 13, fontWeight: 700, color: C.accent, margin: "12px 0 0" }}>
-              体験してみる →
+            <p style={{ fontSize: 13.5, lineHeight: 2.2, color: C.sub, margin: "0 0 26px" }}>
+              結婚式場のスタッフとして、50件以上の披露宴に立ち会ってきました。何百回見ても、両親への手紙で毎回もらい泣きしてしまう。そんな自分だからこそ作れるムービーがあると思い、Muse Movieを始めました。映像と音楽の両方を、ひとりで丁寧にお作りしています。
             </p>
-          </button>
-        ))}
-      </div>
+            <div style={{ background: C.paper, border: `1px solid ${C.border}`, borderRadius: 14, overflow: "hidden" }}>
+              {[
+                ["できること", "プロフィールムービー/エンドロール/レターソング(手紙がそのまま歌に)/オリジナルBGM制作"],
+                ["経歴", "元結婚式場スタッフ(披露宴50件以上)"],
+                ["音楽制作", "AI作曲を活用したオリジナル楽曲。著作権申請の手間がないのも特長です"],
+              ].map(([k, v], i) => (
+                <div key={k} style={{
+                  display: "flex", gap: 14, padding: "14px 18px",
+                  borderTop: i === 0 ? "none" : `1px solid ${C.border}`,
+                  fontSize: 12.5, lineHeight: 1.9,
+                }}>
+                  <span style={{ color: C.accentDeep, fontWeight: 700, flexShrink: 0, width: 70 }}>{k}</span>
+                  <span style={{ color: C.ink }}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* お問い合わせ */}
+      <section id="contact" style={{ padding: "72px 24px 88px", background: C.panel }}>
+        <div style={{ maxWidth: 640, margin: "0 auto", textAlign: "center" }}>
+          <Reveal>
+            <p style={{ letterSpacing: "0.3em", fontSize: 11, color: C.accentDeep, fontWeight: 700, margin: 0 }}>CONTACT</p>
+            <h2 style={{
+              fontFamily: "'Noto Serif JP', serif", fontWeight: 600,
+              fontSize: "clamp(24px, 6vw, 30px)", letterSpacing: "0.14em", lineHeight: 1.8, margin: "14px 0 14px",
+            }}>
+              お問い合わせ
+            </h2>
+            <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 26px" }} />
+            <p style={{ fontSize: 13.5, lineHeight: 2.2, color: C.sub, margin: "0 0 28px" }}>
+              ムービーのことでお手伝いできることがあれば、<br />お気軽にご相談ください。
+            </p>
+            <div style={{ display: "grid", gap: 10, maxWidth: 380, margin: "0 auto" }}>
+              <a href={LINKS.coconala} target="_blank" rel="noreferrer"
+                style={{ display: "block", background: C.accent, color: "#fff", borderRadius: 999, padding: "15px 16px", fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
+                ムービー制作について相談する
+              </a>
+              <a href={LINKS.instagram} target="_blank" rel="noreferrer"
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  background: "transparent", color: C.ink, border: `1.5px solid ${C.accent}`,
+                  borderRadius: 999, padding: "13px 16px", fontSize: 13.5, fontWeight: 700, textDecoration: "none",
+                }}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.accentDeep} strokeWidth="1.8">
+                  <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" />
+                  <circle cx="12" cy="12" r="4.3" />
+                  <circle cx="17.4" cy="6.6" r="1.1" fill={C.accentDeep} stroke="none" />
+                </svg>
+                Instagramで作品を見る
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </section>
     </div>
   );
 }
@@ -676,34 +853,67 @@ function Home({ onSelect }) {
 function App() {
   const [mode, setMode] = useState("home"); // home | bgm | tegami
 
+  const go = (m) => {
+    setMode(m);
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.ink, fontFamily: "'Noto Sans JP', sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap');
         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; }
         .fadein { animation: fadein .45s ease; }
         @keyframes fadein { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
-        .optbtn { transition: background .15s ease, transform .1s ease; }
-        .optbtn:hover { background: #EBE1DA; }
+        .optbtn { transition: background .15s ease, transform .1s ease, opacity .15s ease; }
+        button.optbtn:hover { opacity: .88; }
         .optbtn:active { transform: scale(.985); }
         .lyricline { opacity: 0; animation: linein .7s ease forwards; }
         @keyframes linein { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
         @keyframes rise { from { transform: scaleY(.2);} to { transform: scaleY(1);} }
         .bar { transform-origin: bottom; animation: rise .6s ease both; }
-        @media (prefers-reduced-motion: reduce) { .fadein, .bar { animation: none; } .lyricline { animation: none; opacity: 1; } }
+        @keyframes scrolldrop { 0% { transform: scaleY(0); transform-origin: top;} 45% { transform: scaleY(1); transform-origin: top;} 55% { transform: scaleY(1); transform-origin: bottom;} 100% { transform: scaleY(0); transform-origin: bottom;} }
+        .scrolldot { animation: scrolldrop 2.2s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .fadein, .bar, .scrolldot { animation: none; } .lyricline { animation: none; opacity: 1; } }
       `}</style>
 
-      <div style={{ maxWidth: 560, margin: "0 auto", padding: "40px 20px 64px" }}>
-        <div className="fadein" key={mode}>
-          {mode === "home" && <Home onSelect={setMode} />}
-          {mode === "bgm" && <BgmFlow onHome={() => setMode("home")} />}
-          {mode === "tegami" && <TegamiFlow onHome={() => setMode("home")} />}
+      {/* 固定ヘッダー */}
+      <header style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
+        background: "rgba(239,233,230,0.85)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+        borderBottom: `1px solid ${C.border}`,
+      }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <button onClick={() => go("home")}
+            style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Noto Serif JP', serif", fontSize: 16, fontWeight: 600, letterSpacing: "0.14em", color: C.ink, padding: 0 }}>
+            Muse Movie
+          </button>
+          {mode === "home" ? (
+            <nav style={{ display: "flex", gap: 18 }}>
+              <a href="#taiken" style={{ fontSize: 12, letterSpacing: "0.1em", color: C.sub, textDecoration: "none", fontWeight: 500 }}>ミニ体験</a>
+              <a href="#about" style={{ fontSize: 12, letterSpacing: "0.1em", color: C.sub, textDecoration: "none", fontWeight: 500 }}>つくる人</a>
+              <a href="#contact" style={{ fontSize: 12, letterSpacing: "0.1em", color: C.sub, textDecoration: "none", fontWeight: 500 }}>相談する</a>
+            </nav>
+          ) : (
+            <button onClick={() => go("home")}
+              style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: 12, letterSpacing: "0.1em", color: C.sub, fontWeight: 500 }}>
+              ← トップ
+            </button>
+          )}
         </div>
+      </header>
 
-        <footer style={{ textAlign: "center", marginTop: 32, fontSize: 10.5, color: "#a39a8e", letterSpacing: "0.1em" }}>
-          © Muse Movie — emotional milestone designer
-        </footer>
+      <div className="fadein" key={mode}>
+        {mode === "home" && <Landing onSelect={go} />}
+        {mode === "bgm" && <BgmFlow onHome={() => go("home")} />}
+        {mode === "tegami" && <TegamiFlow onHome={() => go("home")} />}
       </div>
+
+      <footer style={{ textAlign: "center", padding: "26px 20px 34px", fontSize: 10.5, color: "#a39a8e", letterSpacing: "0.1em" }}>
+        © Muse Movie — emotional milestone designer
+      </footer>
     </div>
   );
 }
