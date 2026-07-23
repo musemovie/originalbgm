@@ -374,9 +374,12 @@ function BgmFlow({ onHome, onOther }) {
           <p style={{ textAlign: "center", fontSize: 12, color: C.accent, letterSpacing: "0.2em", margin: "0 0 6px" }}>
             Q{step + 1} / {total}
           </p>
-          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 18, fontWeight: 600, textAlign: "center", margin: "0 0 20px", lineHeight: 1.7 }}>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 18, fontWeight: 600, textAlign: "center", margin: "0 0 8px", lineHeight: 1.7 }}>
             {BGM_QUESTIONS[step].q}
           </h2>
+          <p style={{ textAlign: "center", fontSize: 10.5, color: "#a39a8e", margin: "0 0 18px" }}>
+            回答が保存されることはありません
+          </p>
           <div style={{ display: "grid", gap: 10 }}>
             {BGM_QUESTIONS[step].opts.map((o) => (
               <button key={o.key} className="optbtn" style={optStyle} onClick={() => pick(o.key)}>
@@ -552,9 +555,12 @@ function TegamiFlow({ onHome, onOther }) {
           <p style={{ textAlign: "center", fontSize: 12, color: C.accent, letterSpacing: "0.2em", margin: "0 0 6px" }}>
             Q{step + 1} / {total}
           </p>
-          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 18, fontWeight: 600, textAlign: "center", margin: "0 0 20px", lineHeight: 1.7 }}>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 18, fontWeight: 600, textAlign: "center", margin: "0 0 8px", lineHeight: 1.7 }}>
             {TEGAMI_QUESTIONS[step].q}
           </h2>
+          <p style={{ textAlign: "center", fontSize: 10.5, color: "#a39a8e", margin: "0 0 18px" }}>
+            回答が保存されることはありません
+          </p>
           <div style={{ display: "grid", gap: 10 }}>
             {TEGAMI_QUESTIONS[step].opts.map((o) => (
               <button key={o.key} className="optbtn" style={optStyle} onClick={() => pick(o.key)}>
@@ -685,11 +691,22 @@ function Landing({ onSelect }) {
             </h1>
           </Reveal>
           <Reveal delay={0.3}>
-            <p style={{ fontSize: 14, lineHeight: 2.3, color: C.ink, margin: "0 0 26px", letterSpacing: "0.05em" }}>
+            <p style={{ fontSize: 14, lineHeight: 2.3, color: C.ink, margin: "0 0 14px", letterSpacing: "0.05em" }}>
               おふたりの物語や、両親への手紙。<br />
               大切な言葉が、そのまま一曲の歌になる。<br />
-              <b>2つのミニ体験</b>を用意しました。どちらも無料・1分ほどで試せます。
+              <b>2つのミニ体験</b>を用意しました。
             </p>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 22 }}>
+              {["無料", "登録不要", "約1分"].map((t) => (
+                <span key={t} style={{
+                  fontSize: 11, color: C.accentDeep, fontWeight: 700, letterSpacing: "0.06em",
+                  background: "rgba(251,248,246,0.85)", border: `1px solid ${C.border}`,
+                  borderRadius: 999, padding: "5px 13px",
+                }}>
+                  {t}
+                </span>
+              ))}
+            </div>
           </Reveal>
           <Reveal delay={0.45}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 30 }}>
