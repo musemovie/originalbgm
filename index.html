@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Muse Movie|ムービーに、世界にひとつの音を。</title>
-<meta name="description" content="結婚式のプロフィールムービーとオリジナルBGM、手紙がそのまま歌になるレターソング。Muse Movieの音づくりをミニ体験できます。" />
+<meta name="description" content="結婚式のプロフィールムービーとオリジナル楽曲、手紙がそのまま歌になるレターソング。Muse Movieの音づくりをミニ体験できます。" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
@@ -14,6 +14,7 @@
 <div id="root"></div>
 <script type="text/babel" data-presets="react">
 const { useState, useRef, useEffect } = React;
+
 
 // ================================================================
 // ▼ リンク設定(ここを書き換えるだけでOK)
@@ -25,10 +26,11 @@ const LINKS = {
 
 // ▼ 音源ファイル(index.htmlと同じ場所に置いてください)
 const AUDIO = {
-  emotional: "bgm-emotional.mp3",
-  pop: "bgm-pop.mp3",
-  cinematic: "bgm-cinematic.mp3",
-  natural: "bgm-natural.mp3",
+  ballad: "bgm-ballad.mp3",
+  gentle: "bgm-gentle.mp3",
+  nostalgic: "bgm-nostalgic.mp3",
+  jpop: "bgm-jpop.mp3",
+  cafe: "bgm-cafe.mp3",
   thanks: "song-thanks.mp3",
   sorry: "song-sorry.mp3",
   watch: "song-watch.mp3",
@@ -247,92 +249,110 @@ function Cta({ buttonText }) {
 // 体験①:オリジナルBGM診断
 // ================================================================
 const BGM_RESULTS = {
-  emotional: {
-    name: "しっとり感動バラード", en: "EMOTIONAL BALLAD",
-    desc: "ピアノの一音一音が言葉のように響く、涙腺にそっと触れるタイプ。後半でストリングスが重なり、会場全体が静かにひとつになります。",
-    spec: "ピアノ主体/BPM 70〜90/サビで弦が広がる構成",
+  ballad: {
+    name: "王道の感動バラード",
+    en: "EMOTIONAL BALLAD",
+    desc: "静かなピアノで歌い出し、サビでストリングスが一気に広がるドラマチックな一曲。表現力のある女性ボーカルがメロディの起伏を歌い上げ、会場が静まり返る瞬間をつくります。",
+    spec: "女性ボーカル/ピアノ→ストリングス/ゆったりしたバラード",
+    scene: "涙の場面をつくりたいおふたりに",
   },
-  pop: {
-    name: "ハートフル・ポップ", en: "HEARTFUL POP",
-    desc: "アコースティックギターと手拍子が弾む、思わず笑顔になるタイプ。ゲストの緊張がほどけて、写真の切り替えも軽やかに見えます。",
-    spec: "アコギ+クラップ/BPM 110〜125/明るいメジャーコード",
+  gentle: {
+    name: "しずかに語りかけるアコースティック",
+    en: "GENTLE ACOUSTIC",
+    desc: "ピアノとアコースティックギターだけの、飾らないシンプルな編成。素朴で誠実な男性の歌声が、大切な人にそっと語りかけるように届きます。",
+    spec: "男性ボーカル/ピアノ+アコギ/スローテンポ",
+    scene: "しっとりと、まっすぐ気持ちを伝えたいおふたりに",
   },
-  cinematic: {
-    name: "シネマティック・オーケストラ", en: "CINEMATIC",
-    desc: "静かなピアノから始まり、映画の予告編のように壮大に盛り上がるタイプ。ここぞという場面の期待感を最大まで高めます。",
-    spec: "ピアノ×ストリングス/静→壮大のビルドアップ構成",
+  nostalgic: {
+    name: "あたたかいノスタルジック",
+    en: "NOSTALGIC",
+    desc: "アコギとピアノを軸に、曲が進むにつれてパーカッションやストリングスが重なっていく構成。温かく落ち着いた男性ボーカルが、幼い日の思い出をたどるように歌います。",
+    spec: "男性ボーカル/アコギ+ピアノ+ストリングス/ミディアム",
+    scene: "生い立ちの写真をたっぷり見せたいおふたりに",
   },
-  natural: {
-    name: "ナチュラル・アコースティック", en: "NATURAL ACOUSTIC",
-    desc: "木漏れ日のようなあたたかさのタイプ。アコギやウクレレの生楽器が寄り添い、日常の写真がそのまま愛おしく見えます。",
-    spec: "アコギ・ウクレレ・ハミング/BPM 90〜105",
+  jpop: {
+    name: "まっすぐ届くJ-POP",
+    en: "J-POP",
+    desc: "伸びやかでクリアな女性ボーカルによる、王道のJ-POPスタイル。メロディが素直に耳に入ってきて、優しさと明るさがちょうどよく同居します。",
+    spec: "女性ボーカル/キーボード+ベース+ストリングス/ミディアム",
+    scene: "幅広い年代のゲストに親しみやすく届けたいおふたりに",
+  },
+  cafe: {
+    name: "おしゃれなカフェ・ボサノバ",
+    en: "CAFE BOSSA",
+    desc: "アコギのカッティングと軽快なボサノバ/ジャズ風のリズム。清涼感のある女性ボーカルが、洗練された心地よい空気をつくります。",
+    spec: "女性ボーカル/アコギ+ボサノバ調リズム/軽快なミディアム",
+    scene: "上品でおしゃれな雰囲気にまとめたいおふたりに",
   },
 };
 
 const BGM_QUESTIONS = [
   {
-    q: "どのシーンで流したいですか？",
+    q: "ムービーを見たゲストに、どうなってほしいですか？",
     opts: [
-      { label: "プロフィールムービー", key: "profile", pts: { pop: 1, natural: 1 } },
-      { label: "両親への手紙・エンドロール", key: "letter", pts: { emotional: 2 } },
-      { label: "オープニング・入場", key: "opening", pts: { cinematic: 2 } },
+      { label: "涙がこぼれてほしい", key: "cry", pts: { ballad: 3, gentle: 2 } },
+      { label: "思わず笑顔になってほしい", key: "smile", pts: { jpop: 3, cafe: 2 } },
+      { label: "あたたかく、懐かしい気持ちになってほしい", key: "warm", pts: { nostalgic: 3, gentle: 1 } },
+      { label: "おしゃれな空気に浸ってほしい", key: "chic", pts: { cafe: 3, jpop: 1 } },
+    ],
+  },
+  {
+    q: "歌声は、どちらがお好みですか？",
+    opts: [
+      { label: "女性ボーカル", key: "female", pts: { ballad: 2, jpop: 2, cafe: 2 } },
+      { label: "男性ボーカル", key: "male", pts: { nostalgic: 2, gentle: 2 } },
+      { label: "こだわらない", key: "any", pts: {} },
     ],
   },
   {
     q: "会場はどんな雰囲気ですか？",
     opts: [
-      { label: "ホテル・格式ある会場", key: "hotel", pts: { cinematic: 1, emotional: 1 } },
-      { label: "ガーデン・ゲストハウス", key: "garden", pts: { natural: 2 } },
-      { label: "レストラン・カジュアルな会場", key: "restaurant", pts: { pop: 2 } },
-      { label: "まだ決めていない", key: "undecided", pts: {} },
-    ],
-  },
-  {
-    q: "ムービーを見たゲストに、どうなってほしいですか？",
-    opts: [
-      { label: "涙がこぼれてほしい", key: "cry", pts: { emotional: 3 } },
-      { label: "思わず笑顔になってほしい", key: "smile", pts: { pop: 3 } },
-      { label: "鳥肌が立つほど圧倒されてほしい", key: "awe", pts: { cinematic: 3 } },
-      { label: "あたたかい気持ちになってほしい", key: "warm", pts: { natural: 3 } },
+      { label: "ホテル・格式ある会場", key: "hotel", pts: { ballad: 2 } },
+      { label: "ガーデン・ゲストハウス", key: "garden", pts: { nostalgic: 2, cafe: 1 } },
+      { label: "レストラン・カジュアルな会場", key: "restaurant", pts: { cafe: 2, jpop: 1 } },
+      { label: "少人数・アットホームな会", key: "small", pts: { gentle: 2, nostalgic: 1 } },
     ],
   },
   {
     q: "ふたりの「好きな音」に近いのは？",
     opts: [
-      { label: "静かなピアノの音色", key: "piano", pts: { emotional: 2 } },
-      { label: "明るいJ-POPのバンドサウンド", key: "band", pts: { pop: 2 } },
-      { label: "映画のサウンドトラック", key: "ost", pts: { cinematic: 2 } },
-      { label: "カフェで流れるアコースティック", key: "acoustic", pts: { natural: 2 } },
+      { label: "静かなピアノの音色", key: "piano", pts: { ballad: 2, gentle: 2 } },
+      { label: "明るいJ-POPのバンドサウンド", key: "band", pts: { jpop: 3 } },
+      { label: "カフェで流れるアコースティック", key: "acoustic", pts: { cafe: 3 } },
+      { label: "あたたかい生楽器の響き", key: "organic", pts: { nostalgic: 3, gentle: 1 } },
     ],
   },
 ];
 
-const WISH_TO_TYPE = { cry: "emotional", smile: "pop", awe: "cinematic", warm: "natural" };
+const WISH_TO_TYPE = { cry: "ballad", smile: "jpop", warm: "nostalgic", chic: "cafe" };
 
-const BGM_SCENE_NOTE = {
-  profile: "写真の切り替えと相性のよい、一定テンポの構成に仕上げるのがおすすめです。",
-  letter: "お手紙の朗読やエンドロールに寄り添う、じゃまをしない音の設計が鍵になります。",
-  opening: "イントロの数秒でゲストの視線を集める、立ち上がりの強い構成がおすすめです。",
-};
 const BGM_VENUE_NOTE = {
   hotel: "格式ある会場では、音の厚みがそのまま上質さとして伝わります。",
   garden: "自然光あふれる会場には、生楽器のやわらかな質感がよく馴染みます。",
   restaurant: "ゲストとの距離が近い会場では、親しみやすい音が空気をつくります。",
-  undecided: "",
+  small: "少人数の会では、歌詞のひとことひとことがまっすぐ届きます。",
 };
 
 function bgmDiagnose(answers) {
-  const score = { emotional: 0, pop: 0, cinematic: 0, natural: 0 };
+  const score = { ballad: 0, gentle: 0, nostalgic: 0, jpop: 0, cafe: 0 };
   answers.forEach((ansKey, qi) => {
     const opt = BGM_QUESTIONS[qi].opts.find((o) => o.key === ansKey);
     if (!opt) return;
     for (const [type, p] of Object.entries(opt.pts)) score[type] += p;
   });
-  const sorted = Object.entries(score).sort((a, b) => b[1] - a[1]);
+  // ボーカルの希望があれば、合わない曲は候補から外す
+  const voice = answers[1];
+  const FEMALE = ["ballad", "jpop", "cafe"];
+  const MALE = ["nostalgic", "gentle"];
+  let pool = Object.keys(score);
+  if (voice === "female") pool = FEMALE;
+  if (voice === "male") pool = MALE;
+
+  const sorted = pool.map((t) => [t, score[t]]).sort((a, b) => b[1] - a[1]);
   let firstType = sorted[0][0];
   const firstPts = sorted[0][1];
-  const wishType = WISH_TO_TYPE[answers[2]];
-  if (wishType && score[wishType] === firstPts) firstType = wishType;
+  const wishType = WISH_TO_TYPE[answers[0]];
+  if (wishType && pool.includes(wishType) && score[wishType] === firstPts) firstType = wishType;
   const secondType = sorted.map((e) => e[0]).find((t) => t !== firstType);
   return { firstType, secondType };
 }
@@ -363,7 +383,7 @@ function BgmFlow({ onHome, onOther }) {
         </h1>
         <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 12px" }} />
         <p style={{ fontSize: 13, lineHeight: 1.9, color: C.sub, margin: 0 }}>
-          4つの質問で、おふたりのムービーに合う<br />BGMを診断して、その場で試聴できます。
+          4つの質問で、おふたりに合う曲調を診断。<br />実際にお作りした歌入りの一曲を、その場で聴けます。
         </p>
       </header>
 
@@ -403,13 +423,14 @@ function BgmFlow({ onHome, onOther }) {
               {result.desc}
             </p>
             <div style={{ background: C.bg, borderRadius: 10, padding: "12px 14px", textAlign: "left", fontSize: 12.5, lineHeight: 1.9, color: C.sub }}>
-              <p style={{ margin: 0 }}><b style={{ color: C.accentDeep }}>曲調</b>|{result.spec}</p>
+              <p style={{ margin: 0 }}><b style={{ color: C.accentDeep }}>編成</b>|{result.spec}</p>
+              <p style={{ margin: "6px 0 0" }}><b style={{ color: C.accentDeep }}>こんな方に</b>|{result.scene}</p>
               <p style={{ margin: "6px 0 0" }}>
-                <b style={{ color: C.accentDeep }}>おふたりへ</b>|{BGM_SCENE_NOTE[answers[0]]}{BGM_VENUE_NOTE[answers[1]]}
+                <b style={{ color: C.accentDeep }}>おふたりへ</b>|{BGM_VENUE_NOTE[answers[2]]}
               </p>
             </div>
 
-            <SamplePlayer key={diag.firstType} src={AUDIO[diag.firstType]} label="SAMPLE(30秒)" />
+            <SamplePlayer key={diag.firstType} src={AUDIO[diag.firstType]} label="サンプル曲(40秒・歌入り)" />
 
             <p style={{ fontSize: 11.5, color: "#8a8177", marginTop: 14, textAlign: "left" }}>
               次に近いタイプは「{second.name}」でした。「もう一度診断する」から別の答え方も試してみてください。
@@ -417,7 +438,8 @@ function BgmFlow({ onHome, onOther }) {
           </div>
 
           <p style={{ fontSize: 12, lineHeight: 1.9, color: C.sub, textAlign: "center", margin: "18px 0 0" }}>
-            Muse Movieでは、市販曲ではなく<b>おふたりのためだけに作曲したオリジナルBGM</b>を<br />ムービーとセットでお届けしています。
+            サンプルの5曲は、<b>すべて同じ歌詞を別々の曲調で歌い分けた</b>ものです。<br />
+            実際の制作では、<b>おふたりの物語から歌詞を書き起こして</b>、世界にひとつの一曲に仕上げます。
           </p>
 
           <Cta buttonText="この曲調で、おふたりだけの一曲を作る" />
@@ -720,7 +742,7 @@ function Landing({ onSelect }) {
                   オリジナル<br />BGM診断
                 </p>
                 <p style={{ fontSize: 11, lineHeight: 1.7, color: C.sub, margin: 0 }}>
-                  4つの質問で<br />合う曲を試聴 →
+                  4つの質問で<br />歌入りの曲を試聴 →
                 </p>
               </button>
               <button onClick={() => onSelect("tegami")} className="optbtn"
@@ -784,7 +806,7 @@ function Landing({ onSelect }) {
                   プロフィールムービーに<br />オリジナルBGMを
                 </h3>
                 <p style={{ fontSize: 13.5, lineHeight: 2.2, color: C.sub, textAlign: "left", margin: "0 0 22px" }}>
-                  Muse Movieのプロフィールムービーは、市販曲ではなく、おふたりのためだけに作曲したオリジナルBGMでお作りします。4つの質問に答えると、おふたりに合う曲調を診断して、実際のサンプル曲をその場で試聴できます。
+                  Muse Movieのプロフィールムービーは、市販曲ではなく、おふたりの物語から歌詞を書き起こしたオリジナル楽曲でお作りします。4つの質問に答えると、おふたりに合う曲調を診断。同じ歌詞を5つの曲調で歌い分けたサンプルから、ぴったりの一曲をその場で聴けます。
                 </p>
                 <button onClick={() => onSelect("bgm")} className="optbtn"
                   style={{
@@ -991,6 +1013,8 @@ function App() {
     </div>
   );
 }
+
+
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
