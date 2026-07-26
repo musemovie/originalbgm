@@ -459,18 +459,9 @@ function BgmFlow({ onHome, onOther }) {
 
             <SamplePlayer key={diag.firstType} src={AUDIO[diag.firstType]} label="この曲調のサンプル(40秒・歌入り)" />
 
-            <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "#a39a8e", textAlign: "left", margin: "10px 0 0" }}>
-              ※ サンプルの歌詞は、別のおふたりのためにお作りしたものです
+            <p style={{ fontSize: 12, lineHeight: 1.9, color: C.sub, textAlign: "left", marginTop: 16 }}>
+              これは代表例としてお作りした一曲です。実際の制作では、<b>お聞きしたおふたりのエピソードをもとに歌詞を一から書き起こして</b>、世界にひとつの一曲に仕上げます。
             </p>
-
-            <div style={{ background: C.panel, borderRadius: 12, padding: "22px 20px", textAlign: "center", marginTop: 16 }}>
-              <p style={{
-                fontFamily: "'Noto Serif JP', serif", fontSize: 15.5, fontWeight: 600,
-                lineHeight: 2.1, letterSpacing: "0.05em", color: C.ink, margin: 0,
-              }}>
-                実際の制作では、お聞きしたエピソードをもとに<br />歌詞を一から書き起こします。
-              </p>
-            </div>
           </div>
 
           <Cta buttonText="ココナラで相談してみる(無料)" />
