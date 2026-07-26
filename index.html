@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Muse Movie|ムービーに、世界にひとつの音を。</title>
-<meta name="description" content="結婚式のプロフィールムービーとオリジナル楽曲、手紙がそのまま歌になるレターソング。Muse Movieの音づくりをミニ体験できます。" />
+<meta name="description" content="結婚式のプロフィールムービーに、おふたりの物語を歌詞にしたこの世に一曲だけの歌を。手紙がそのまま歌になるレターソングも。Muse Movieの音づくりをミニ体験できます。" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
@@ -297,41 +297,55 @@ const BGM_QUESTIONS = [
     ],
   },
   {
-    q: "歌声は、どちらがお好みですか？",
+    q: "おふたりの歌は、どんな声で歌ってほしいですか？",
     opts: [
       { label: "女性ボーカル", key: "female", pts: { ballad: 2, jpop: 2, cafe: 2 } },
       { label: "男性ボーカル", key: "male", pts: { nostalgic: 2, gentle: 2 } },
-      { label: "こだわらない", key: "any", pts: {} },
-    ],
-  },
-  {
-    q: "会場はどんな雰囲気ですか？",
-    opts: [
-      { label: "ホテル・格式ある会場", key: "hotel", pts: { ballad: 2 } },
-      { label: "ガーデン・ゲストハウス", key: "garden", pts: { nostalgic: 2, cafe: 1 } },
-      { label: "レストラン・カジュアルな会場", key: "restaurant", pts: { cafe: 2, jpop: 1 } },
-      { label: "少人数・アットホームな会", key: "small", pts: { gentle: 2, nostalgic: 1 } },
+      { label: "おまかせしたい", key: "any", pts: {} },
     ],
   },
   {
     q: "ふたりの「好きな音」に近いのは？",
     opts: [
-      { label: "静かなピアノの音色", key: "piano", pts: { ballad: 2, gentle: 2 } },
+      { label: "静かなピアノの音色", key: "piano", pts: { ballad: 3, gentle: 2 } },
       { label: "明るいJ-POPのバンドサウンド", key: "band", pts: { jpop: 3 } },
       { label: "カフェで流れるアコースティック", key: "acoustic", pts: { cafe: 3 } },
-      { label: "あたたかい生楽器の響き", key: "organic", pts: { nostalgic: 3, gentle: 1 } },
+      { label: "あたたかい生楽器の響き", key: "organic", pts: { nostalgic: 3, gentle: 2 } },
+    ],
+  },
+  {
+    q: "歌詞にするなら、どの場面がいいですか？",
+    opts: [
+      { label: "はじめて出会った日のこと", key: "meet", pts: {} },
+      { label: "プロポーズの言葉", key: "propose", pts: {} },
+      { label: "なんでもない毎日のこと", key: "daily", pts: {} },
+      { label: "育ててくれた家族へのきもち", key: "family", pts: {} },
     ],
   },
 ];
 
+// 歌詞に入れる場面(結果画面での提案文)
+const EPISODE_NOTE = {
+  meet: {
+    label: "はじめて出会った日",
+    line: "はじめて目が合った瞬間、交わした最初の言葉。おふたりだけが知っているあの日の空気を、そのまま歌い出しにします。",
+  },
+  propose: {
+    label: "プロポーズの言葉",
+    line: "彼が伝えた言葉、あなたが返した言葉。実際に交わされたそのセリフを、サビの一行にそのまま置きます。",
+  },
+  daily: {
+    label: "なんでもない毎日",
+    line: "いつもの帰り道、ふたりの口ぐせ、休日の朝。何気ない日常こそ、聴いた人が思わず笑ってしまう歌詞になります。",
+  },
+  family: {
+    label: "家族へのきもち",
+    line: "育ててくれた日々への感謝を、おふたりの言葉のまま歌詞に。ご両親の席で、涙が止まらなくなる一曲になります。",
+  },
+};
+
 const WISH_TO_TYPE = { cry: "ballad", smile: "jpop", warm: "nostalgic", chic: "cafe" };
 
-const BGM_VENUE_NOTE = {
-  hotel: "格式ある会場では、音の厚みがそのまま上質さとして伝わります。",
-  garden: "自然光あふれる会場には、生楽器のやわらかな質感がよく馴染みます。",
-  restaurant: "ゲストとの距離が近い会場では、親しみやすい音が空気をつくります。",
-  small: "少人数の会では、歌詞のひとことひとことがまっすぐ届きます。",
-};
 
 function bgmDiagnose(answers) {
   const score = { ballad: 0, gentle: 0, nostalgic: 0, jpop: 0, cafe: 0 };
@@ -340,7 +354,7 @@ function bgmDiagnose(answers) {
     if (!opt) return;
     for (const [type, p] of Object.entries(opt.pts)) score[type] += p;
   });
-  // ボーカルの希望があれば、合わない曲は候補から外す
+  // 歌声の希望があれば、合わない曲は候補から外す
   const voice = answers[1];
   const FEMALE = ["ballad", "jpop", "cafe"];
   const MALE = ["nostalgic", "gentle"];
@@ -372,18 +386,17 @@ function BgmFlow({ onHome, onOther }) {
 
   const diag = step === total ? bgmDiagnose(answers) : null;
   const result = diag ? BGM_RESULTS[diag.firstType] : null;
-  const second = diag ? BGM_RESULTS[diag.secondType] : null;
 
   return (
     <div style={{ maxWidth: 560, margin: "0 auto", padding: "96px 20px 64px" }}>
       <header style={{ textAlign: "center", marginBottom: 26 }}>
-        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>ORIGINAL BGM</p>
+        <p style={{ letterSpacing: "0.35em", fontSize: 11, color: C.accent, margin: 0 }}>YOUR ORIGINAL SONG</p>
         <h1 style={{ fontFamily: "'Noto Serif JP', serif", fontWeight: 600, fontSize: 24, margin: "10px 0 8px", letterSpacing: "0.08em" }}>
-          オリジナルBGM<br />ミニ体験
+          ふたりだけの一曲を<br />つくってみる
         </h1>
         <div style={{ width: 48, height: 1, background: C.accent, margin: "0 auto 12px" }} />
         <p style={{ fontSize: 13, lineHeight: 1.9, color: C.sub, margin: 0 }}>
-          4つの質問で、おふたりに合う曲調を診断。<br />実際にお作りした歌入りの一曲を、その場で聴けます。
+          4つの質問に答えると、おふたりのために<br />どんな一曲がつくれるかが分かります。
         </p>
       </header>
 
@@ -415,34 +428,48 @@ function BgmFlow({ onHome, onOther }) {
         <div className="fadein">
           <div style={{ background: C.paper, border: `1px solid ${C.border}`, borderRadius: 16, padding: "28px 22px", textAlign: "center" }}>
             <Wave />
-            <p style={{ letterSpacing: "0.3em", fontSize: 10, color: C.accent, margin: 0 }}>{result.en}</p>
-            <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 22, fontWeight: 600, margin: "8px 0 14px", letterSpacing: "0.05em" }}>
-              {result.name}
+            <p style={{ letterSpacing: "0.3em", fontSize: 10, color: C.accent, margin: 0 }}>YOUR ORIGINAL SONG</p>
+            <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 20, fontWeight: 600, margin: "10px 0 12px", letterSpacing: "0.05em", lineHeight: 1.7 }}>
+              おふたりのための一曲は<br />こんな曲になります
             </h2>
-            <p style={{ fontSize: 13.5, lineHeight: 2, color: "#4c463f", textAlign: "left", margin: "0 0 14px" }}>
-              {result.desc}
-            </p>
-            <div style={{ background: C.bg, borderRadius: 10, padding: "12px 14px", textAlign: "left", fontSize: 12.5, lineHeight: 1.9, color: C.sub }}>
-              <p style={{ margin: 0 }}><b style={{ color: C.accentDeep }}>編成</b>|{result.spec}</p>
-              <p style={{ margin: "6px 0 0" }}><b style={{ color: C.accentDeep }}>こんな方に</b>|{result.scene}</p>
-              <p style={{ margin: "6px 0 0" }}>
-                <b style={{ color: C.accentDeep }}>おふたりへ</b>|{BGM_VENUE_NOTE[answers[2]]}
-              </p>
+
+            {/* 一曲の設計図 */}
+            <div style={{ background: C.bg, borderRadius: 12, overflow: "hidden", textAlign: "left" }}>
+              {[
+                ["曲調", result.name],
+                ["編成", result.spec],
+                ["歌詞", `「${EPISODE_NOTE[answers[3]].label}」から書き起こします`],
+              ].map(([k, v], i) => (
+                <div key={k} style={{
+                  display: "flex", gap: 12, padding: "12px 14px",
+                  borderTop: i === 0 ? "none" : `1px solid ${C.border}`,
+                  fontSize: 12.5, lineHeight: 1.8,
+                }}>
+                  <span style={{ color: C.accentDeep, fontWeight: 700, flexShrink: 0, width: 38 }}>{k}</span>
+                  <span style={{ color: C.ink }}>{v}</span>
+                </div>
+              ))}
             </div>
 
-            <SamplePlayer key={diag.firstType} src={AUDIO[diag.firstType]} label="サンプル曲(40秒・歌入り)" />
-
-            <p style={{ fontSize: 11.5, color: "#8a8177", marginTop: 14, textAlign: "left" }}>
-              次に近いタイプは「{second.name}」でした。「もう一度診断する」から別の答え方も試してみてください。
+            <p style={{ fontSize: 13, lineHeight: 2.1, color: "#4c463f", textAlign: "left", margin: "16px 0 0" }}>
+              {EPISODE_NOTE[answers[3]].line}
             </p>
+            <p style={{ fontSize: 13, lineHeight: 2.1, color: "#4c463f", textAlign: "left", margin: "10px 0 0" }}>
+              {result.desc}
+            </p>
+
+            <SamplePlayer key={diag.firstType} src={AUDIO[diag.firstType]} label="この曲調のサンプル(40秒・歌入り)" />
+
+            <div style={{ background: C.panel, borderRadius: 12, padding: "16px 16px", textAlign: "left", marginTop: 16 }}>
+              <p style={{ fontSize: 13, lineHeight: 2.1, color: C.ink, margin: 0 }}>
+                いま聴いていただいたのは、<b>別のおふたりのためにお作りした歌詞</b>を、この曲調で歌ったものです。
+                <br />
+                おふたりの一曲は、<b>歌詞からすべて新しく書き起こします</b>。同じ歌は、世界にひとつもありません。
+              </p>
+            </div>
           </div>
 
-          <p style={{ fontSize: 12, lineHeight: 1.9, color: C.sub, textAlign: "center", margin: "18px 0 0" }}>
-            サンプルの5曲は、<b>すべて同じ歌詞を別々の曲調で歌い分けた</b>ものです。<br />
-            実際の制作では、<b>おふたりの物語から歌詞を書き起こして</b>、世界にひとつの一曲に仕上げます。
-          </p>
-
-          <Cta buttonText="この曲調で、おふたりだけの一曲を作る" />
+          <Cta buttonText="この一曲について相談する" />
 
           <button onClick={onOther} className="optbtn"
             style={{
@@ -458,7 +485,7 @@ function BgmFlow({ onHome, onOther }) {
           <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 18 }}>
             <button onClick={restart}
               style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
-              もう一度診断する
+              別の答えでもう一度
             </button>
             <button onClick={onHome}
               style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
@@ -652,7 +679,7 @@ function TegamiFlow({ onHome, onOther }) {
           <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 18 }}>
             <button onClick={restart}
               style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
-              もう一度診断する
+              別の答えでもう一度
             </button>
             <button onClick={onHome}
               style={{ background: "none", border: "none", color: "#8a8177", fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}>
@@ -739,7 +766,7 @@ function Landing({ onSelect }) {
                 }}>
                 <p style={{ letterSpacing: "0.2em", fontSize: 9, color: C.accentDeep, fontWeight: 700, margin: "0 0 6px" }}>MINI EXPERIENCE 01</p>
                 <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 14.5, fontWeight: 600, color: C.ink, margin: "0 0 6px", lineHeight: 1.6 }}>
-                  オリジナル<br />BGM診断
+                  ふたりだけの<br />一曲をつくる
                 </p>
                 <p style={{ fontSize: 11, lineHeight: 1.7, color: C.sub, margin: 0 }}>
                   4つの質問で<br />歌入りの曲を試聴 →
@@ -803,17 +830,17 @@ function Landing({ onSelect }) {
               <div style={{ padding: "26px 26px 30px", textAlign: "center" }}>
                 <p style={{ letterSpacing: "0.25em", fontSize: 10, color: C.accentDeep, fontWeight: 700, margin: "0 0 8px" }}>MINI EXPERIENCE 01</p>
                 <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 20, fontWeight: 600, letterSpacing: "0.1em", lineHeight: 1.8, margin: "0 0 14px" }}>
-                  プロフィールムービーに<br />オリジナルBGMを
+                  プロフィールムービーの曲を<br />ふたりのために作る
                 </h3>
                 <p style={{ fontSize: 13.5, lineHeight: 2.2, color: C.sub, textAlign: "left", margin: "0 0 22px" }}>
-                  Muse Movieのプロフィールムービーは、市販曲ではなく、おふたりの物語から歌詞を書き起こしたオリジナル楽曲でお作りします。4つの質問に答えると、おふたりに合う曲調を診断。同じ歌詞を5つの曲調で歌い分けたサンプルから、ぴったりの一曲をその場で聴けます。
+市販の曲を流す代わりに、おふたりの出会いやプロポーズの言葉を歌詞にした、この世に一曲だけの歌をお作りできます。4つの質問に答えると、おふたりの一曲がどんな曲になるかが分かり、その曲調のサンプルを歌入りで聴けます。
                 </p>
                 <button onClick={() => onSelect("bgm")} className="optbtn"
                   style={{
                     background: C.accent, color: "#fff", border: "none", borderRadius: 999,
                     padding: "15px 40px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
                   }}>
-                  BGM診断をやってみる
+                  どんな曲になるか見てみる
                 </button>
               </div>
             </div>
