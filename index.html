@@ -220,7 +220,7 @@ function Cta({ buttonText }) {
       <p style={{ fontSize: 13, lineHeight: 2, color: C.ink, textAlign: "left", margin: "0 0 18px" }}>
         プロフィールムービーやエンドロール、両親への手紙がそのまま一曲の歌になる「レターソング」など、おふたりのためだけのムービーとオリジナル楽曲をお作りしています。
         <br />
-        ムービーのことでお手伝いできることがあれば、お気軽にご相談ください。
+        ムービーのことでお手伝いできることがあれば、お気軽にご相談ください。ご相談・お見積もりは無料です。
       </p>
       <div style={{ display: "grid", gap: 10 }}>
         <a href={LINKS.coconala} target="_blank" rel="noreferrer"
@@ -459,28 +459,21 @@ function BgmFlow({ onHome, onOther }) {
 
             <SamplePlayer key={diag.firstType} src={AUDIO[diag.firstType]} label="この曲調のサンプル(40秒・歌入り)" />
 
-            <div style={{ background: C.panel, borderRadius: 12, padding: "20px 18px", textAlign: "left", marginTop: 16 }}>
-              <p style={{ fontSize: 13, lineHeight: 2.1, color: C.sub, margin: "0 0 12px" }}>
-                いま聴いていただいた歌詞は、
-                <br />
-                別のおふたりのためにお作りしたものです。
-              </p>
-              <p style={{ fontSize: 13, lineHeight: 2.1, color: C.ink, margin: "0 0 12px" }}>
-                実際の制作では、お聞きしたエピソードをもとに
-                <br />
-                歌詞を一から書き起こします。
-              </p>
+            <p style={{ fontSize: 11.5, lineHeight: 1.9, color: "#a39a8e", textAlign: "left", margin: "10px 0 0" }}>
+              ※ サンプルの歌詞は、別のおふたりのためにお作りしたものです
+            </p>
+
+            <div style={{ background: C.panel, borderRadius: 12, padding: "22px 20px", textAlign: "center", marginTop: 16 }}>
               <p style={{
-                fontFamily: "'Noto Serif JP', serif", fontSize: 15, fontWeight: 600,
-                lineHeight: 1.9, color: C.ink, margin: 0,
-                paddingTop: 12, borderTop: `1px solid ${C.border}`,
+                fontFamily: "'Noto Serif JP', serif", fontSize: 15.5, fontWeight: 600,
+                lineHeight: 2.1, letterSpacing: "0.05em", color: C.ink, margin: 0,
               }}>
-                だから、同じ歌はどこにもありません。
+                実際の制作では、お聞きしたエピソードをもとに<br />歌詞を一から書き起こします。
               </p>
             </div>
           </div>
 
-          <Cta buttonText="この一曲について相談する" />
+          <Cta buttonText="ココナラで相談してみる(無料)" />
 
           <button onClick={onOther} className="optbtn"
             style={{
@@ -674,7 +667,7 @@ function TegamiFlow({ onHome, onOther }) {
             </p>
           </div>
 
-          <Cta buttonText="手紙ソングについて相談する" />
+          <Cta buttonText="ココナラで相談してみる(無料)" />
 
           <button onClick={onOther} className="optbtn"
             style={{
