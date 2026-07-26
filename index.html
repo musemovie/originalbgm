@@ -459,11 +459,23 @@ function BgmFlow({ onHome, onOther }) {
 
             <SamplePlayer key={diag.firstType} src={AUDIO[diag.firstType]} label="この曲調のサンプル(40秒・歌入り)" />
 
-            <div style={{ background: C.panel, borderRadius: 12, padding: "16px 16px", textAlign: "left", marginTop: 16 }}>
-              <p style={{ fontSize: 13, lineHeight: 2.1, color: C.ink, margin: 0 }}>
-                いま聴いていただいたのは、<b>別のおふたりのためにお作りした歌詞</b>を、この曲調で歌ったものです。
+            <div style={{ background: C.panel, borderRadius: 12, padding: "20px 18px", textAlign: "left", marginTop: 16 }}>
+              <p style={{ fontSize: 13, lineHeight: 2.1, color: C.sub, margin: "0 0 12px" }}>
+                いま聴いていただいた歌詞は、
                 <br />
-                実際の制作では、お聞きしたおふたりのエピソードをもとに、<b>歌詞を一から書き起こします</b>。同じ歌は、世界にひとつもありません。
+                別のおふたりのためにお作りしたものです。
+              </p>
+              <p style={{ fontSize: 13, lineHeight: 2.1, color: C.ink, margin: "0 0 12px" }}>
+                実際の制作では、お聞きしたエピソードをもとに
+                <br />
+                歌詞を一から書き起こします。
+              </p>
+              <p style={{
+                fontFamily: "'Noto Serif JP', serif", fontSize: 15, fontWeight: 600,
+                lineHeight: 1.9, color: C.ink, margin: 0,
+                paddingTop: 12, borderTop: `1px solid ${C.border}`,
+              }}>
+                だから、同じ歌はどこにもありません。
               </p>
             </div>
           </div>
